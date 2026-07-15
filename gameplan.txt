@@ -1,0 +1,56 @@
+1. Game Title
+"Word Sprint: Island Escape"
+
+2. Game Description
+A side-scrolling educational game where players control a character navigating a platforming course. To jump over obstacles or reach new heights, the player must identify the correct word (e.g., matching a synonym, filling in a grammar blank, or choosing the correct verb tense) presented on floating platforms. It turns "drills" into a reaction-based challenge.
+
+3. Game Framework
+Since the job you are looking at requires Phaser, you should build this using:
+
+Engine: Phaser 3 (JavaScript/TypeScript).
+
+Logic: A state-driven approach where the game pauses to ask a question, and the player's input determines the physics of the next movement.
+
+Asset Management: Simple 2D sprite sheets or SVG shapes (which you can create or find on sites like Kenney.nl for free).
+
+4. Game Flow
+The game follows a strict "Loop, Challenge, Reward" cycle:
+
+Preparation (The Setup):
+
+The game loads a JSON configuration file containing the list of words/questions.
+
+The player character enters from the left and begins a slow, constant walk.
+
+The Trigger (The Challenge):
+
+The character reaches a gap in the floor.
+
+The game state changes to QUESTION_MODE. The character stops moving.
+
+A prompt appears (e.g., "What is the past tense of 'run'?").
+
+Three platforms appear as "buttons" labeled: Ran, Runned, Running.
+
+The Decision (Player Interaction):
+
+If the player clicks the Correct Platform:
+
+The platform turns green, the character performs a "jump" animation over the gap, and the game state returns to RUNNING_MODE.
+
+If the player clicks the Incorrect Platform:
+
+The platform turns red, the character shakes their head or trips, and the game provides a hint or requires them to retry before proceeding.
+
+The Reward (Progression):
+
+The character reaches the end of the level.
+
+A "Success!" screen appears showing the score (number of correct answers) and a "Play Again" button.
+
+Why this works for you
+It’s modular: If you want to make the game harder, you just update the JSON file with harder vocabulary. The game engine doesn't have to change.
+
+It’s a "Slice": You can build the entire game with just one question and one obstacle. Once that works, you just multiply the content.
+
+Professional Appeal: This demonstrates that you understand game loops, state management, and data-driven design—the three things any employer looking for an educational game dev wants to see.
