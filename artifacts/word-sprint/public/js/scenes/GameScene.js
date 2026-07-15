@@ -370,15 +370,8 @@ class GameScene extends Phaser.Scene {
     const q = this.questions[index];
 
     this.promptSign.setVisible(true).setAlpha(0);
-    this.promptBg.setVisible(true);
+    this.promptBg.setVisible(true).setAlpha(0);
     this.promptText.setText(`${index + 1}. ${q.prompt}`).setVisible(true);
-
-    this.tweens.add({
-      targets: this.promptSign,
-      alpha: 1,
-      duration: 300,
-      ease: 'Power2'
-    });
 
     for (let i = 0; i < 3; i++) {
       const plat = this.answerPlatforms[i];
@@ -391,15 +384,13 @@ class GameScene extends Phaser.Scene {
     this.arrow.setAlpha(0);
 
     // Bouncy entrance
-    this.promptBg.scaleX = 1;
-    this.promptBg.scaleY = 0;
     this.promptText.scaleX = 0;
     this.promptText.scaleY = 0;
     this.tweens.add({
-      targets: [this.promptBg],
-      scaleY: 1,
-      duration: 400,
-      ease: 'Back.easeOut'
+      targets: [this.promptSign, this.promptBg],
+      alpha: 1,
+      duration: 300,
+      ease: 'Power2'
     });
     this.tweens.add({
       targets: [this.promptText],
@@ -491,7 +482,6 @@ class GameScene extends Phaser.Scene {
     this.tweens.add({
         targets: [this.promptSign, this.promptBg, this.promptText, this.hintText],
         alpha: 0,
-        scale: 0.8,
         duration: 200,
         ease: 'Power2',
         onComplete: () => {
