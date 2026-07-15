@@ -5,7 +5,7 @@ class GameScene extends Phaser.Scene {
     this.PLATFORM_WIDTH = 64;
     this.GAP_WIDTH = 200;
     this.WALK_SPEED = 150;
-    this.QUESTION_PLATFORM_Y = 240;
+    this.QUESTION_PLATFORM_Y = 220;
     this.WORLD_PADDING = 200;
   }
 
@@ -27,32 +27,59 @@ class GameScene extends Phaser.Scene {
   createBackground() {
     const worldWidth = this.totalQuestions * (this.PLATFORM_WIDTH + this.GAP_WIDTH) + this.WORLD_PADDING * 2;
 
-    // Sky gradient
+    // Sky gradient (warm sunset/sunrise vibe)
     const bg = this.add.graphics();
     for (let i = 0; i < 540; i++) {
       const t = i / 540;
-      const r = Math.floor(135 + t * 40);
-      const g = Math.floor(206 + t * 20);
-      const b = Math.floor(235 - t * 30);
+      const r = Math.floor(255 - t * 40);
+      const g = Math.floor(180 + t * 30);
+      const b = Math.floor(140 + t * 80);
       bg.fillStyle(Phaser.Display.Color.GetColor(r, g, b), 1);
       bg.fillRect(0, i, worldWidth, 1);
     }
 
+    // Sun
+    const sun = this.add.circle(800, 150, 60, 0xffeaa7);
+    sun.setScrollFactor(0.05);
+    // Sun glow
+    this.tweens.add({
+      targets: sun,
+      scale: 1.1,
+      alpha: 0.8,
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
     // Clouds
-    for (let i = 0; i < Math.ceil(worldWidth / 300); i++) {
-      const cloud = this.add.image(i * 300 + Phaser.Math.Between(-50, 50), Phaser.Math.Between(40, 140), 'cloud');
-      cloud.setAlpha(Phaser.Math.FloatBetween(0.4, 0.8));
-      cloud.setScale(Phaser.Math.FloatBetween(0.6, 1.2));
-      cloud.setScrollFactor(0.3);
+    for (let i = 0; i < Math.ceil(worldWidth / 250); i++) {
+      const cloud = this.add.image(i * 250 + Phaser.Math.Between(-50, 50), Phaser.Math.Between(40, 160), 'cloud');
+      cloud.setAlpha(Phaser.Math.FloatBetween(0.6, 0.9));
+      cloud.setScale(Phaser.Math.FloatBetween(0.7, 1.3));
+      cloud.setScrollFactor(0.2);
+      
+      this.tweens.add({
+        targets: cloud,
+        y: cloud.y + Phaser.Math.Between(-10, 10),
+        duration: Phaser.Math.Between(3000, 5000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
     }
 
     // Distant mountains
     const mountains = this.add.graphics();
-    mountains.fillStyle(0x6b8f71, 0.4);
-    for (let x = 0; x < worldWidth; x += 200) {
-      const h = Phaser.Math.Between(80, 160);
-      mountains.fillTriangle(x, this.GROUND_Y, x + 100, this.GROUND_Y - h, x + 200, this.GROUND_Y);
+    mountains.fillStyle(0x34495e, 0.5); // darker blue/grey
+    for (let x = 0; x < worldWidth * 0.8; x += 150) {
+      const h = Phaser.Math.Between(100, 200);
+      mountains.fillTriangle(x, this.GROUND_Y + 50, x + 100, this.GROUND_Y - h, x + 250, this.GROUND_Y + 50);
     }
+    const mtTexture = mountains.generateTexture('mountains', worldWidth * 0.8, 540);
+    mountains.destroy();
+    
+    this.add.image(0, 0, 'mountains').setOrigin(0, 0).setScrollFactor(0.4);
   }
 
   createWorld() {
@@ -65,6 +92,16 @@ class GameScene extends Phaser.Scene {
       const x = this.WORLD_PADDING + i * (this.PLATFORM_WIDTH + this.GAP_WIDTH);
       const plat = this.platforms.create(x, this.GROUND_Y, 'ground');
       plat.setScale(1, 1).refreshBody();
+      
+      // Floating animation for platforms
+      this.tweens.add({
+        targets: plat,
+        y: plat.y + 4,
+        duration: 1500 + i * 100,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
 
       if (i < this.totalQuestions) {
         this.gaps.push({
@@ -78,7 +115,16 @@ class GameScene extends Phaser.Scene {
     // Water under gaps
     for (const gap of this.gaps) {
       for (let wx = gap.x - this.GAP_WIDTH / 2; wx < gap.x + this.GAP_WIDTH / 2; wx += 64) {
-        this.add.image(wx, this.GROUND_Y + 24, 'water');
+        const w = this.add.image(wx, this.GROUND_Y + 28, 'water');
+        // Gentle wave tween
+        this.tweens.add({
+          targets: w,
+          y: w.y + 6,
+          duration: 1200,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+        });
       }
     }
 
@@ -86,47 +132,81 @@ class GameScene extends Phaser.Scene {
     for (let i = 0; i < this.totalQuestions + 1; i++) {
       const x = this.WORLD_PADDING + i * (this.PLATFORM_WIDTH + this.GAP_WIDTH);
       if (Phaser.Math.Between(0, 1) === 0) {
-        this.add.image(x + Phaser.Math.Between(-20, 20), this.GROUND_Y - 30, 'trunk');
-        this.add.image(x + Phaser.Math.Between(-20, 20), this.GROUND_Y - 55, 'leaves');
+        const treeX = x + Phaser.Math.Between(-15, 15);
+        this.add.image(treeX, this.GROUND_Y - 30, 'trunk');
+        const leaves = this.add.image(treeX, this.GROUND_Y - 55, 'leaves');
+        
+        // Wind effect on leaves
+        this.tweens.add({
+          targets: leaves,
+          angle: Phaser.Math.Between(-3, 3),
+          duration: Phaser.Math.Between(2000, 3000),
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+        });
       }
     }
   }
 
   createCharacter() {
-    this.charContainer = this.add.container(this.WORLD_PADDING, this.GROUND_Y - 42);
+    this.charContainer = this.add.container(this.WORLD_PADDING, this.GROUND_Y - 48);
 
-    this.charHead = this.add.image(0, -18, 'charHead');
+    this.charShadow = this.add.ellipse(0, 34, 24, 8, 0x000000, 0.3);
+    
     this.charBody = this.add.image(0, 8, 'charBody');
-    this.charContainer.add([this.charBody, this.charHead]);
+    this.charHead = this.add.image(0, -14, 'charHead');
+    
+    this.charContainer.add([this.charShadow, this.charBody, this.charHead]);
 
-    this.charContainer.setSize(28, 60);
+    this.charContainer.setSize(30, 48);
     this.physics.world.enable(this.charContainer);
     this.charContainer.body.setAllowGravity(false);
-    this.charContainer.body.setVelocityX(this.WALK_SPEED);
     this.charContainer.body.setCollideWorldBounds(false);
 
     this.isJumping = false;
     this.walkTween = null;
+    
+    // Dust particles
+    this.dustEmitter = this.add.particles(0, 0, 'particle', {
+        x: { onEmit: () => this.charContainer.x, onUpdate: () => this.charContainer.x },
+        y: { onEmit: () => this.charContainer.y + 30, onUpdate: () => this.charContainer.y + 30 },
+        speed: { min: 10, max: 30 },
+        angle: { min: 160, max: 200 },
+        scale: { start: 1, end: 0 },
+        alpha: { start: 0.5, end: 0 },
+        lifespan: 400,
+        frequency: 100,
+        blendMode: 'NORMAL'
+    });
+    this.dustEmitter.stop();
   }
 
   createUI() {
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
+
     // Score display
     this.scoreText = this.add.text(20, 20, `Score: 0 / ${this.totalQuestions}`, {
-      fontSize: '22px',
-      fontFamily: 'Arial, sans-serif',
+      fontSize: '26px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 3
+      stroke: '#2c3e50',
+      strokeThickness: 5,
+      shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 4, stroke: false, fill: true }
     }).setScrollFactor(0).setDepth(100);
 
     // Question prompt
     this.promptBg = this.add.graphics().setScrollFactor(0).setDepth(90).setVisible(false);
-    this.promptBg.fillStyle(0x000000, 0.75);
-    this.promptBg.fillRoundedRect(0, 0, 700, 60, 12);
+    this.promptBg.fillStyle(0x1a252f, 0.9);
+    this.promptBg.fillRoundedRect(130, 30, 700, 80, 20);
+    this.promptBg.lineStyle(4, 0x34495e, 1);
+    this.promptBg.strokeRoundedRect(130, 30, 700, 80, 20);
 
-    this.promptText = this.add.text(480, 50, '', {
-      fontSize: '22px',
-      fontFamily: 'Arial, sans-serif',
+    this.promptText = this.add.text(480, 70, '', {
+      fontSize: '28px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff',
       wordWrap: { width: 660 },
       align: 'center'
@@ -138,82 +218,119 @@ class GameScene extends Phaser.Scene {
 
     for (let i = 0; i < 3; i++) {
       const x = 280 + i * 200;
-      const plat = this.add.image(x, this.QUESTION_PLATFORM_Y, 'platform')
-        .setScrollFactor(0)
-        .setDepth(90)
-        .setVisible(false)
-        .setInteractive({ useHandCursor: true });
+      const platContainer = this.add.container(x, this.QUESTION_PLATFORM_Y).setScrollFactor(0).setDepth(90).setVisible(false);
+      
+      const plat = this.add.image(0, 0, 'platform').setInteractive({ useHandCursor: true });
+      
+      const txt = this.add.text(0, 0, '', {
+        fontSize: '22px',
+        fontFamily: fontFamily,
+        fontWeight: 'bold',
+        color: '#ffffff',
+        stroke: '#2c3e50',
+        strokeThickness: 4
+      }).setOrigin(0.5);
 
+      platContainer.add([plat, txt]);
+      
       plat.on('pointerdown', () => this.handleAnswer(i));
       plat.on('pointerover', () => {
-        if (this.gameState === 'QUESTION') plat.setTint(0xcccccc);
+        if (this.gameState === 'QUESTION') {
+            this.tweens.add({ targets: platContainer, scale: 1.1, duration: 150, ease: 'Back.easeOut' });
+            plat.setTint(0xe0e0e0);
+        }
       });
       plat.on('pointerout', () => {
-        if (this.gameState === 'QUESTION') plat.clearTint();
+        if (this.gameState === 'QUESTION') {
+            this.tweens.add({ targets: platContainer, scale: 1, duration: 150, ease: 'Power1' });
+            plat.clearTint();
+        }
       });
 
-      const txt = this.add.text(x, this.QUESTION_PLATFORM_Y, '', {
-        fontSize: '18px',
-        fontFamily: 'Arial, sans-serif',
-        color: '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 2
-      }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
-
-      this.answerPlatforms.push(plat);
+      this.answerPlatforms.push({ container: platContainer, image: plat });
       this.answerTexts.push(txt);
     }
 
     // Hint text
     this.hintText = this.add.text(480, 310, '', {
-      fontSize: '16px',
-      fontFamily: 'Arial, sans-serif',
+      fontSize: '20px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffeb3b',
-      stroke: '#000000',
-      strokeThickness: 2,
+      stroke: '#c0392b',
+      strokeThickness: 4,
+      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 2, fill: true },
       wordWrap: { width: 660 },
       align: 'center'
     }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
 
     // Arrow hint
-    this.arrow = this.add.image(880, this.GROUND_Y - 60, 'arrow')
+    this.arrow = this.add.image(900, this.GROUND_Y - 80, 'arrow')
       .setScrollFactor(0)
       .setDepth(80)
       .setAlpha(0);
 
     this.tweens.add({
       targets: this.arrow,
-      x: 900,
-      duration: 600,
+      x: 920,
+      duration: 500,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
+    
+    // Sparkle Emitter (for correct answers)
+    this.sparkleEmitter = this.add.particles(0, 0, 'sparkle', {
+        speed: { min: 50, max: 150 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1, end: 0 },
+        alpha: { start: 1, end: 0 },
+        lifespan: 800,
+        tint: 0x2ecc71,
+        blendMode: 'ADD'
+    });
+    this.sparkleEmitter.stop();
   }
 
   setupCamera() {
     const worldWidth = this.totalQuestions * (this.PLATFORM_WIDTH + this.GAP_WIDTH) + this.WORLD_PADDING * 2;
     this.cameras.main.setBounds(0, 0, worldWidth, 540);
-    this.cameras.main.startFollow(this.charContainer, true, 0.1, 0.1);
+    this.cameras.main.startFollow(this.charContainer, true, 0.08, 0.08);
   }
 
   startWalking() {
     this.charContainer.body.setVelocityX(this.WALK_SPEED);
+    this.dustEmitter.start();
+    
     this.walkTween = this.tweens.add({
       targets: this.charContainer,
-      y: this.GROUND_Y - 44,
-      duration: 200,
+      y: this.GROUND_Y - 52,
+      duration: 150,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
+    });
+    
+    this.bobTween = this.tweens.add({
+        targets: [this.charBody, this.charHead],
+        y: '-=4',
+        duration: 150,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+        delay: 75
     });
   }
 
   stopWalking() {
     this.charContainer.body.setVelocityX(0);
+    this.dustEmitter.stop();
     if (this.walkTween) {
       this.walkTween.stop();
-      this.charContainer.y = this.GROUND_Y - 42;
+      this.bobTween.stop();
+      this.charContainer.y = this.GROUND_Y - 48;
+      this.charBody.y = 8;
+      this.charHead.y = -14;
     }
   }
 
@@ -221,7 +338,7 @@ class GameScene extends Phaser.Scene {
     if (this.gameState !== 'RUNNING') return;
 
     for (const gap of this.gaps) {
-      if (!gap.triggered && Math.abs(this.charContainer.x - gap.x) < 80) {
+      if (!gap.triggered && Math.abs(this.charContainer.x - gap.x) < 90) {
         gap.triggered = true;
         this.triggerQuestion(gap.questionIndex);
         break;
@@ -240,18 +357,44 @@ class GameScene extends Phaser.Scene {
     this.promptText.setText(`${index + 1}. ${q.prompt}`).setVisible(true);
 
     for (let i = 0; i < 3; i++) {
-      this.answerPlatforms[i].setVisible(true).clearTint();
-      this.answerTexts[i].setText(q.options[i]).setVisible(true);
+      const plat = this.answerPlatforms[i];
+      plat.container.setVisible(true).setScale(1);
+      plat.image.setTexture('platform').clearTint();
+      this.answerTexts[i].setText(q.options[i]).setVisible(true).setColor('#ffffff');
     }
 
     this.hintText.setVisible(false);
+    this.arrow.setAlpha(0);
 
+    // Bouncy entrance
+    this.promptBg.scaleY = 0;
+    this.promptText.scale = 0;
     this.tweens.add({
-      targets: [this.promptBg, this.promptText, ...this.answerPlatforms, ...this.answerTexts],
-      alpha: { from: 0, to: 1 },
-      duration: 300,
-      ease: 'Power2'
+      targets: [this.promptBg],
+      scaleY: 1,
+      duration: 400,
+      ease: 'Back.easeOut'
     });
+    this.tweens.add({
+      targets: [this.promptText],
+      scale: 1,
+      duration: 400,
+      delay: 100,
+      ease: 'Back.easeOut'
+    });
+
+    for (let i = 0; i < 3; i++) {
+        this.answerPlatforms[i].container.y = this.QUESTION_PLATFORM_Y + 50;
+        this.answerPlatforms[i].container.alpha = 0;
+        this.tweens.add({
+            targets: this.answerPlatforms[i].container,
+            y: this.QUESTION_PLATFORM_Y,
+            alpha: 1,
+            duration: 400,
+            delay: 200 + i * 100,
+            ease: 'Back.easeOut'
+        });
+    }
   }
 
   handleAnswer(index) {
@@ -259,52 +402,88 @@ class GameScene extends Phaser.Scene {
 
     const q = this.questions[this.currentQuestion];
     const isCorrect = index === q.correct;
+    const plat = this.answerPlatforms[index];
 
     if (isCorrect) {
       this.score++;
+      
+      // Score animation
       this.scoreText.setText(`Score: ${this.score} / ${this.totalQuestions}`);
+      this.tweens.add({
+          targets: this.scoreText,
+          scale: 1.5,
+          yoyo: true,
+          duration: 200,
+          ease: 'Power2'
+      });
 
-      this.answerPlatforms[index].setTexture('platformGreen');
-      this.answerPlatforms[index].setTint(0xffffff);
+      plat.image.setTexture('platformGreen');
+      plat.image.setTint(0xffffff);
+      plat.container.setScale(1.1);
 
       this.gameState = 'CORRECT';
+      
+      // Emit sparkles relative to the screen position of the platform
+      this.sparkleEmitter.emitParticleAt(plat.container.x, plat.container.y, 30);
 
-      this.time.delayedCall(500, () => {
+      this.time.delayedCall(700, () => {
         this.hideQuestionUI();
         this.performJump();
       });
     } else {
-      this.answerPlatforms[index].setTexture('platformRed');
-      this.answerPlatforms[index].setTint(0xffffff);
-      this.answerTexts[index].setColor('#ff6666');
+      plat.image.setTexture('platformRed');
+      plat.image.setTint(0xffffff);
+      this.answerTexts[index].setColor('#ffdddd');
 
       this.hintText.setText(q.hint).setVisible(true);
+      this.hintText.scale = 0;
+      this.tweens.add({ targets: this.hintText, scale: 1, duration: 300, ease: 'Back.easeOut' });
 
+      // Screen shake and character shake
+      this.cameras.main.shake(300, 0.005);
       this.tweens.add({
         targets: this.charContainer,
-        x: this.charContainer.x - 5,
+        x: this.charContainer.x - 8,
         duration: 50,
         yoyo: true,
         repeat: 3
       });
 
-      this.time.delayedCall(1200, () => {
-        this.answerPlatforms[index].setTexture('platform');
-        this.answerPlatforms[index].clearTint();
+      this.time.delayedCall(1500, () => {
+        plat.image.setTexture('platform');
+        plat.image.clearTint();
         this.answerTexts[index].setColor('#ffffff');
         this.hintText.setVisible(false);
+        plat.container.setScale(1);
       });
     }
   }
 
   hideQuestionUI() {
-    this.promptBg.setVisible(false);
-    this.promptText.setVisible(false);
-    this.hintText.setVisible(false);
+    this.tweens.add({
+        targets: [this.promptBg, this.promptText, this.hintText],
+        alpha: 0,
+        scale: 0.8,
+        duration: 200,
+        ease: 'Power2',
+        onComplete: () => {
+            this.promptBg.setVisible(false);
+            this.promptText.setVisible(false);
+            this.hintText.setVisible(false);
+        }
+    });
 
     for (let i = 0; i < 3; i++) {
-      this.answerPlatforms[i].setVisible(false).setTexture('platform');
-      this.answerTexts[i].setVisible(false).setColor('#ffffff');
+        this.tweens.add({
+            targets: this.answerPlatforms[i].container,
+            alpha: 0,
+            y: this.QUESTION_PLATFORM_Y - 20,
+            duration: 200,
+            ease: 'Power2',
+            onComplete: () => {
+                this.answerPlatforms[i].container.setVisible(false);
+            }
+        });
     }
   }
 
@@ -314,14 +493,33 @@ class GameScene extends Phaser.Scene {
 
     const startX = this.charContainer.x;
     const startY = this.charContainer.y;
-    const jumpHeight = 180;
-    const jumpDistance = this.GAP_WIDTH + 80;
+    const jumpHeight = 160;
+    const jumpDistance = this.GAP_WIDTH + 75;
+
+    // Flip char slightly during jump
+    this.tweens.add({
+        targets: this.charContainer,
+        angle: 15,
+        duration: 400,
+        yoyo: true,
+        ease: 'Sine.easeInOut'
+    });
+    
+    // Shrink shadow
+    this.tweens.add({
+        targets: this.charShadow,
+        scale: 0.3,
+        alpha: 0.1,
+        duration: 400,
+        yoyo: true,
+        ease: 'Sine.easeInOut'
+    });
 
     this.tweens.add({
       targets: this.charContainer,
       x: startX + jumpDistance,
       duration: 800,
-      ease: 'Power1',
+      ease: 'Linear',
       onUpdate: () => {
         const progress = (this.charContainer.x - startX) / jumpDistance;
         const arc = -4 * jumpHeight * progress * (progress - 1);
@@ -329,10 +527,14 @@ class GameScene extends Phaser.Scene {
       },
       onComplete: () => {
         this.isJumping = false;
-        this.charContainer.y = this.GROUND_Y - 42;
+        this.charContainer.y = this.GROUND_Y - 48;
+        this.charContainer.angle = 0;
+
+        // Landing dust
+        this.dustEmitter.emitParticleAt(this.charContainer.x, this.charContainer.y + 30, 10);
 
         if (this.currentQuestion >= this.totalQuestions - 1) {
-          this.time.delayedCall(400, () => {
+          this.time.delayedCall(500, () => {
             this.scene.start('SuccessScene', {
               score: this.score,
               total: this.totalQuestions
@@ -341,7 +543,7 @@ class GameScene extends Phaser.Scene {
         } else {
           this.gameState = 'RUNNING';
           this.startWalking();
-          this.arrow.setAlpha(0.7);
+          this.arrow.setAlpha(0.8);
         }
       }
     });
