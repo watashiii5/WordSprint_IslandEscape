@@ -123,7 +123,7 @@ class GameScene extends Phaser.Scene {
     // Water under gaps
     for (const gap of this.gaps) {
       for (let wx = gap.x - this.GAP_WIDTH / 2; wx < gap.x + this.GAP_WIDTH / 2; wx += 64) {
-        const w = this.add.image(wx, this.GROUND_Y + 28, 'water');
+        const w = this.add.image(wx, this.GROUND_Y + 28, 'water').setDepth(5);
         // Gentle wave tween
         this.tweens.add({
           targets: w,
@@ -211,17 +211,13 @@ class GameScene extends Phaser.Scene {
       .setDepth(90)
       .setVisible(false);
 
-    this.promptBg = this.add.graphics().setScrollFactor(0).setDepth(90).setVisible(false);
-    this.promptBg.fillStyle(0x1a252f, 0.85);
-    this.promptBg.fillRoundedRect(130, 30, 700, 80, 20);
-    this.promptBg.lineStyle(4, 0x8B6914, 1);
-    this.promptBg.strokeRoundedRect(130, 30, 700, 80, 20);
-
     this.promptText = this.add.text(480, 70, '', {
       fontSize: '28px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
       color: '#ffffff',
+      stroke: '#2c3e50',
+      strokeThickness: 4,
       wordWrap: { width: 660 },
       align: 'center'
     }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
@@ -325,16 +321,6 @@ class GameScene extends Phaser.Scene {
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
-    
-    this.bobTween = this.tweens.add({
-        targets: this.charSprite,
-        y: '-=4',
-        duration: 150,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-        delay: 75
-    });
   }
 
   stopWalking() {
@@ -344,9 +330,7 @@ class GameScene extends Phaser.Scene {
     this.charSprite.setFrame(4);
     if (this.walkTween) {
       this.walkTween.stop();
-      this.bobTween.stop();
       this.charContainer.y = this.GROUND_Y - 48;
-      this.charSprite.y = 0;
     }
   }
 
@@ -370,13 +354,14 @@ class GameScene extends Phaser.Scene {
     const q = this.questions[index];
 
     this.promptSign.setVisible(true).setAlpha(0);
-    this.promptBg.setVisible(true).setAlpha(0);
     this.promptText.setText(`${index + 1}. ${q.prompt}`).setVisible(true);
 
     for (let i = 0; i < 3; i++) {
+      this.tweens.killTweensOf(this.answerPlatforms[i].container);
       const plat = this.answerPlatforms[i];
-      plat.container.setVisible(true).setScale(1);
+      plat.container.setVisible(true).setAlpha(1).setScale(1).setY(this.QUESTION_PLATFORM_Y + 50);
       plat.image.setTexture('platform').clearTint();
+      plat.image.input.enabled = true;
       this.answerTexts[i].setText(q.options[i]).setVisible(true).setColor('#ffffff');
     }
 
@@ -387,7 +372,7 @@ class GameScene extends Phaser.Scene {
     this.promptText.scaleX = 0;
     this.promptText.scaleY = 0;
     this.tweens.add({
-      targets: [this.promptSign, this.promptBg],
+      targets: [this.promptSign],
       alpha: 1,
       duration: 300,
       ease: 'Power2'
@@ -401,8 +386,6 @@ class GameScene extends Phaser.Scene {
     });
 
     for (let i = 0; i < 3; i++) {
-        this.answerPlatforms[i].container.y = this.QUESTION_PLATFORM_Y + 50;
-        this.answerPlatforms[i].container.alpha = 0;
         this.tweens.add({
             targets: this.answerPlatforms[i].container,
             y: this.QUESTION_PLATFORM_Y,
@@ -468,31 +451,34 @@ class GameScene extends Phaser.Scene {
         repeat: 3
       });
 
+      const qIdx = this.currentQuestion;
       this.time.delayedCall(1500, () => {
-        plat.image.setTexture('platform');
-        plat.image.clearTint();
-        this.answerTexts[index].setColor('#ffffff');
-        this.hintText.setVisible(false);
-        plat.container.setScale(1);
+        if (this.currentQuestion === qIdx && this.gameState === 'QUESTION') {
+          plat.image.setTexture('platform');
+          plat.image.clearTint();
+          this.answerTexts[index].setColor('#ffffff');
+          this.hintText.setVisible(false);
+          plat.container.setScale(1);
+        }
       });
     }
   }
 
   hideQuestionUI() {
     this.tweens.add({
-        targets: [this.promptSign, this.promptBg, this.promptText, this.hintText],
+        targets: [this.promptSign, this.promptText, this.hintText],
         alpha: 0,
         duration: 200,
         ease: 'Power2',
         onComplete: () => {
             this.promptSign.setVisible(false);
-            this.promptBg.setVisible(false);
             this.promptText.setVisible(false);
             this.hintText.setVisible(false);
         }
     });
 
     for (let i = 0; i < 3; i++) {
+        this.answerPlatforms[i].image.input.enabled = false;
         this.tweens.add({
             targets: this.answerPlatforms[i].container,
             alpha: 0,
