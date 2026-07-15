@@ -45,6 +45,7 @@ class BootScene extends Phaser.Scene {
   }
 
   create() {
+    window.gameSound.init();
     this.generateTextures();
     this.generateParticles();
     this.createAnimations();

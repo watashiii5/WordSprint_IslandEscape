@@ -9,6 +9,7 @@ class SuccessScene extends Phaser.Scene {
     const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
     this.cameras.main.fadeIn(400);
+    window.gameSound.playComplete();
 
     // Premium Background (Radial Gradient look via multiple circles)
     const bg = this.add.graphics();
@@ -168,6 +169,7 @@ class SuccessScene extends Phaser.Scene {
     });
 
     btnZone.on('pointerdown', () => {
+      window.gameSound.playClick();
       this.scene.start('GameScene');
     });
 

@@ -428,6 +428,7 @@ class GameScene extends Phaser.Scene {
 
     if (isCorrect) {
       this.score++;
+      window.gameSound.playCorrect();
       
       // Score animation
       this.scoreText.setText(`Score: ${this.score} / ${this.totalQuestions}`);
@@ -453,6 +454,7 @@ class GameScene extends Phaser.Scene {
         this.performJump();
       });
     } else {
+      window.gameSound.playWrong();
       plat.image.setTexture('platformRed');
       plat.image.setTint(0xffffff);
       this.answerTexts[index].setColor('#ffdddd');
@@ -513,6 +515,7 @@ class GameScene extends Phaser.Scene {
   performJump() {
     this.isJumping = true;
     this.gameState = 'JUMPING';
+    window.gameSound.playJump();
 
     const startX = this.charContainer.x;
     const startY = this.charContainer.y;
@@ -552,6 +555,7 @@ class GameScene extends Phaser.Scene {
         this.isJumping = false;
         this.charContainer.y = this.GROUND_Y - 48;
         this.charContainer.angle = 0;
+        window.gameSound.playLand();
 
         // Landing dust
         this.dustEmitter.emitParticleAt(this.charContainer.x, this.charContainer.y + 30, 10);

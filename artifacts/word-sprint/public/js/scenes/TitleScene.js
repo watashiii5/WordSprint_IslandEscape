@@ -172,6 +172,8 @@ class TitleScene extends Phaser.Scene {
     });
 
     btnZone.on('pointerdown', () => {
+      window.gameSound.resume();
+      window.gameSound.playClick();
       this.cameras.main.fadeOut(400, 0, 0, 0);
       this.time.delayedCall(400, () => {
         this.scene.start('GameScene');

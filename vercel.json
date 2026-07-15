@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm run build",
-  "outputDirectory": "artifacts/word-sprint/dist/public",
+  "buildCommand": null,
+  "outputDirectory": "artifacts/word-sprint/public",
   "framework": null,
   "installCommand": "pnpm install",
   "headers": [
