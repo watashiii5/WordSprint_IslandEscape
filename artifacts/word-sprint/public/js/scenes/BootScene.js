@@ -34,9 +34,9 @@ class BootScene extends Phaser.Scene {
     this.load.json('questions', 'data/questions.json');
     
     this.load.image('logo', 'assets/logo.png');
-    this.load.image('beach_bg', 'assets/beach_bg.png');
-    this.load.image('wooden_sign', 'assets/wooden_sign.png');
-    this.load.image('stone_platform', 'assets/stone_platform.png');
+    this.load.image('beach_bg', 'assets/beach_bg.jpg');
+    this.load.image('wooden_sign', 'assets/wooden_sign.jpg');
+    this.load.image('stone_platform', 'assets/stone_platform.jpg');
     
     this.load.spritesheet('character', 'assets/character.png', {
       frameWidth: 352,

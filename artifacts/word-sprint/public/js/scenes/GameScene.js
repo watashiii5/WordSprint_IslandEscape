@@ -161,11 +161,11 @@ class GameScene extends Phaser.Scene {
     this.charContainer = this.add.container(this.WORLD_PADDING, this.GROUND_Y - 48);
 
     this.charShadow = this.add.ellipse(0, 34, 24, 8, 0x000000, 0.3);
-    
-    this.charBody = this.add.image(0, 8, 'charBody');
-    this.charHead = this.add.image(0, -14, 'charHead');
-    
-    this.charContainer.add([this.charShadow, this.charBody, this.charHead]);
+
+    this.charSprite = this.add.sprite(0, 0, 'character', 4);
+    this.charSprite.setScale(0.35);
+
+    this.charContainer.add([this.charShadow, this.charSprite]);
 
     this.charContainer.setSize(30, 48);
     this.physics.world.enable(this.charContainer);
@@ -315,6 +315,7 @@ class GameScene extends Phaser.Scene {
   startWalking() {
     this.charContainer.body.setVelocityX(this.WALK_SPEED);
     this.dustEmitter.start();
+    this.charSprite.play('walk');
     
     this.walkTween = this.tweens.add({
       targets: this.charContainer,
@@ -326,7 +327,7 @@ class GameScene extends Phaser.Scene {
     });
     
     this.bobTween = this.tweens.add({
-        targets: [this.charBody, this.charHead],
+        targets: this.charSprite,
         y: '-=4',
         duration: 150,
         yoyo: true,
@@ -339,12 +340,13 @@ class GameScene extends Phaser.Scene {
   stopWalking() {
     this.charContainer.body.setVelocityX(0);
     this.dustEmitter.stop();
+    this.charSprite.stop();
+    this.charSprite.setFrame(4);
     if (this.walkTween) {
       this.walkTween.stop();
       this.bobTween.stop();
       this.charContainer.y = this.GROUND_Y - 48;
-      this.charBody.y = 8;
-      this.charHead.y = -14;
+      this.charSprite.y = 0;
     }
   }
 
@@ -389,8 +391,10 @@ class GameScene extends Phaser.Scene {
     this.arrow.setAlpha(0);
 
     // Bouncy entrance
+    this.promptBg.scaleX = 1;
     this.promptBg.scaleY = 0;
-    this.promptText.scale = 0;
+    this.promptText.scaleX = 0;
+    this.promptText.scaleY = 0;
     this.tweens.add({
       targets: [this.promptBg],
       scaleY: 1,
