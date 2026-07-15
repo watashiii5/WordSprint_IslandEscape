@@ -11,5 +11,5 @@ const GAME_CONFIG = {
       debug: false
     }
   },
-  scene: ['BootScene', 'GameScene', 'SuccessScene']
+  scene: ['BootScene', 'TitleScene', 'GameScene', 'SuccessScene']
 };

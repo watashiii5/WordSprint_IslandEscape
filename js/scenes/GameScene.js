@@ -21,27 +21,32 @@ class GameScene extends Phaser.Scene {
     this.createCharacter();
     this.createUI();
     this.setupCamera();
+    this.cameras.main.fadeIn(400);
     this.startWalking();
   }
 
   createBackground() {
     const worldWidth = this.totalQuestions * (this.PLATFORM_WIDTH + this.GAP_WIDTH) + this.WORLD_PADDING * 2;
 
-    // Sky gradient (warm sunset/sunrise vibe)
+    // Beach background image (tiled across world)
+    const bgImg = this.add.image(0, 0, 'beach_bg').setOrigin(0, 0);
+    bgImg.setDisplaySize(worldWidth, 540);
+    bgImg.setScrollFactor(0.1);
+
+    // Sky gradient overlay (warm sunset/sunrise vibe)
     const bg = this.add.graphics();
     for (let i = 0; i < 540; i++) {
       const t = i / 540;
       const r = Math.floor(255 - t * 40);
       const g = Math.floor(180 + t * 30);
       const b = Math.floor(140 + t * 80);
-      bg.fillStyle(Phaser.Display.Color.GetColor(r, g, b), 1);
+      bg.fillStyle(Phaser.Display.Color.GetColor(r, g, b), 0.4);
       bg.fillRect(0, i, worldWidth, 1);
     }
 
     // Sun
     const sun = this.add.circle(800, 150, 60, 0xffeaa7);
     sun.setScrollFactor(0.05);
-    // Sun glow
     this.tweens.add({
       targets: sun,
       scale: 1.1,
@@ -58,7 +63,7 @@ class GameScene extends Phaser.Scene {
       cloud.setAlpha(Phaser.Math.FloatBetween(0.6, 0.9));
       cloud.setScale(Phaser.Math.FloatBetween(0.7, 1.3));
       cloud.setScrollFactor(0.2);
-      
+
       this.tweens.add({
         targets: cloud,
         y: cloud.y + Phaser.Math.Between(-10, 10),
@@ -70,16 +75,19 @@ class GameScene extends Phaser.Scene {
     }
 
     // Distant mountains
-    const mountains = this.add.graphics();
-    mountains.fillStyle(0x34495e, 0.5); // darker blue/grey
-    for (let x = 0; x < worldWidth * 0.8; x += 150) {
-      const h = Phaser.Math.Between(100, 200);
-      mountains.fillTriangle(x, this.GROUND_Y + 50, x + 100, this.GROUND_Y - h, x + 250, this.GROUND_Y + 50);
+    const mtKey = 'mountains_' + worldWidth;
+    if (!this.textures.exists(mtKey)) {
+      const mountains = this.add.graphics();
+      mountains.fillStyle(0x34495e, 0.5);
+      for (let x = 0; x < worldWidth * 0.8; x += 150) {
+        const h = Phaser.Math.Between(100, 200);
+        mountains.fillTriangle(x, this.GROUND_Y + 50, x + 100, this.GROUND_Y - h, x + 250, this.GROUND_Y + 50);
+      }
+      mountains.generateTexture(mtKey, worldWidth * 0.8, 540);
+      mountains.destroy();
     }
-    const mtTexture = mountains.generateTexture('mountains', worldWidth * 0.8, 540);
-    mountains.destroy();
-    
-    this.add.image(0, 0, 'mountains').setOrigin(0, 0).setScrollFactor(0.4);
+
+    this.add.image(0, 0, mtKey).setOrigin(0, 0).setScrollFactor(0.4);
   }
 
   createWorld() {
@@ -196,11 +204,17 @@ class GameScene extends Phaser.Scene {
       shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 4, stroke: false, fill: true }
     }).setScrollFactor(0).setDepth(100);
 
-    // Question prompt
+    // Question prompt (using wooden_sign asset)
+    this.promptSign = this.add.image(480, 70, 'wooden_sign')
+      .setDisplaySize(720, 110)
+      .setScrollFactor(0)
+      .setDepth(90)
+      .setVisible(false);
+
     this.promptBg = this.add.graphics().setScrollFactor(0).setDepth(90).setVisible(false);
-    this.promptBg.fillStyle(0x1a252f, 0.9);
+    this.promptBg.fillStyle(0x1a252f, 0.85);
     this.promptBg.fillRoundedRect(130, 30, 700, 80, 20);
-    this.promptBg.lineStyle(4, 0x34495e, 1);
+    this.promptBg.lineStyle(4, 0x8B6914, 1);
     this.promptBg.strokeRoundedRect(130, 30, 700, 80, 20);
 
     this.promptText = this.add.text(480, 70, '', {
@@ -353,8 +367,16 @@ class GameScene extends Phaser.Scene {
 
     const q = this.questions[index];
 
+    this.promptSign.setVisible(true).setAlpha(0);
     this.promptBg.setVisible(true);
     this.promptText.setText(`${index + 1}. ${q.prompt}`).setVisible(true);
+
+    this.tweens.add({
+      targets: this.promptSign,
+      alpha: 1,
+      duration: 300,
+      ease: 'Power2'
+    });
 
     for (let i = 0; i < 3; i++) {
       const plat = this.answerPlatforms[i];
@@ -461,12 +483,13 @@ class GameScene extends Phaser.Scene {
 
   hideQuestionUI() {
     this.tweens.add({
-        targets: [this.promptBg, this.promptText, this.hintText],
+        targets: [this.promptSign, this.promptBg, this.promptText, this.hintText],
         alpha: 0,
         scale: 0.8,
         duration: 200,
         ease: 'Power2',
         onComplete: () => {
+            this.promptSign.setVisible(false);
             this.promptBg.setVisible(false);
             this.promptText.setVisible(false);
             this.hintText.setVisible(false);

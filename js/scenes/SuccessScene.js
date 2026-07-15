@@ -8,6 +8,8 @@ class SuccessScene extends Phaser.Scene {
     const total = data.total || 5;
     const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
+    this.cameras.main.fadeIn(400);
+
     // Premium Background (Radial Gradient look via multiple circles)
     const bg = this.add.graphics();
     bg.fillStyle(0x1a2a6c, 1);
