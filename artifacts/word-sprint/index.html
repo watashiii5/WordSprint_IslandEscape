@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Word Sprint: Island Escape</title>
+    <meta name="description" content="Word Sprint: Island Escape — A side-scrolling educational word game where you jump over obstacles by answering vocabulary questions!" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Word Sprint: Island Escape" />
+    <meta property="og:description" content="A side-scrolling educational word game where you jump over obstacles by answering vocabulary questions!" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Word Sprint: Island Escape" />
+    <meta name="twitter:description" content="A side-scrolling educational word game where you jump over obstacles by answering vocabulary questions!" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+      }
+      #game-container {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,255,255,0.1);
+        position: relative;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/scenes/BootScene.js"></script>
+    <script src="/js/scenes/TitleScene.js"></script>
+    <script src="/js/scenes/GameScene.js"></script>
+    <script src="/js/scenes/SuccessScene.js"></script>
+    <script src="/js/game.js"></script>
+  </body>
+</html>

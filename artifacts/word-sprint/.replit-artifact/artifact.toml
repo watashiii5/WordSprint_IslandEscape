@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Word Sprint: Island Escape"
+version = "1.0.0"
+id = "artifacts/word-sprint"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21082
+
+[services.development]
+run = "pnpm --filter @workspace/word-sprint run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/word-sprint", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/word-sprint/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21082"
+BASE_PATH = "/"
