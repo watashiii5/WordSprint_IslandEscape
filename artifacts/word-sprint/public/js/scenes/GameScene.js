@@ -98,7 +98,7 @@ class GameScene extends Phaser.Scene {
 
     for (let i = 0; i <= this.totalQuestions; i++) {
       const x = this.WORLD_PADDING + i * (this.PLATFORM_WIDTH + this.GAP_WIDTH);
-      const plat = this.platforms.create(x, this.GROUND_Y, 'ground');
+      const plat = this.platforms.create(x, this.GROUND_Y, 'ground').setDepth(10);
       plat.setScale(1, 1).refreshBody();
       
       // Floating animation for platforms
@@ -123,7 +123,7 @@ class GameScene extends Phaser.Scene {
     // Water under gaps
     for (const gap of this.gaps) {
       for (let wx = gap.x - this.GAP_WIDTH / 2; wx < gap.x + this.GAP_WIDTH / 2; wx += 64) {
-        const w = this.add.image(wx, this.GROUND_Y + 28, 'water').setDepth(5);
+        const w = this.add.image(wx, this.GROUND_Y + 28, 'water').setDepth(2);
         // Gentle wave tween
         this.tweens.add({
           targets: w,
@@ -141,8 +141,8 @@ class GameScene extends Phaser.Scene {
       const x = this.WORLD_PADDING + i * (this.PLATFORM_WIDTH + this.GAP_WIDTH);
       if (Phaser.Math.Between(0, 1) === 0) {
         const treeX = x + Phaser.Math.Between(-15, 15);
-        this.add.image(treeX, this.GROUND_Y - 30, 'trunk');
-        const leaves = this.add.image(treeX, this.GROUND_Y - 55, 'leaves');
+        this.add.image(treeX, this.GROUND_Y - 30, 'trunk').setDepth(12);
+        const leaves = this.add.image(treeX, this.GROUND_Y - 55, 'leaves').setDepth(12);
         
         // Wind effect on leaves
         this.tweens.add({
@@ -158,12 +158,12 @@ class GameScene extends Phaser.Scene {
   }
 
   createCharacter() {
-    this.charContainer = this.add.container(this.WORLD_PADDING, this.GROUND_Y - 48);
+    this.charContainer = this.add.container(this.WORLD_PADDING, this.GROUND_Y - 48).setDepth(15);
 
     this.charShadow = this.add.ellipse(0, 34, 24, 8, 0x000000, 0.3);
 
-    this.charSprite = this.add.sprite(0, 0, 'character', 4);
-    this.charSprite.setScale(0.35);
+    this.charSprite = this.add.sprite(0, 0, 'char_4');
+    this.charSprite.setScale(0.7);
 
     this.charContainer.add([this.charShadow, this.charSprite]);
 
@@ -186,7 +186,7 @@ class GameScene extends Phaser.Scene {
         lifespan: 400,
         frequency: 100,
         blendMode: 'NORMAL'
-    });
+    }).setDepth(14);
     this.dustEmitter.stop();
   }
 
@@ -298,7 +298,7 @@ class GameScene extends Phaser.Scene {
         lifespan: 800,
         tint: 0x2ecc71,
         blendMode: 'ADD'
-    });
+    }).setDepth(50);
     this.sparkleEmitter.stop();
   }
 
@@ -327,7 +327,7 @@ class GameScene extends Phaser.Scene {
     this.charContainer.body.setVelocityX(0);
     this.dustEmitter.stop();
     this.charSprite.stop();
-    this.charSprite.setFrame(4);
+    this.charSprite.setTexture('char_4');
     if (this.walkTween) {
       this.walkTween.stop();
       this.charContainer.y = this.GROUND_Y - 48;
@@ -350,6 +350,7 @@ class GameScene extends Phaser.Scene {
     this.currentQuestion = index;
     this.gameState = 'QUESTION';
     this.stopWalking();
+    this.charSprite.play('idle');
 
     const q = this.questions[index];
 
@@ -479,22 +480,38 @@ class GameScene extends Phaser.Scene {
 
     for (let i = 0; i < 3; i++) {
         this.answerPlatforms[i].image.input.enabled = false;
+        this.tweens.killTweensOf(this.answerPlatforms[i].container);
         this.tweens.add({
             targets: this.answerPlatforms[i].container,
             alpha: 0,
+            scale: 1,
             y: this.QUESTION_PLATFORM_Y - 20,
             duration: 200,
             ease: 'Power2',
             onComplete: () => {
                 this.answerPlatforms[i].container.setVisible(false);
+                this.answerPlatforms[i].container.setScale(1);
+                this.answerPlatforms[i].container.setAlpha(0);
             }
         });
     }
+
+    this.time.delayedCall(300, () => {
+        for (let i = 0; i < 3; i++) {
+            this.answerPlatforms[i].container.setVisible(false);
+            this.answerPlatforms[i].container.setAlpha(0);
+            this.answerPlatforms[i].container.setScale(1);
+        }
+        this.promptSign.setVisible(false);
+        this.promptText.setVisible(false);
+        this.hintText.setVisible(false);
+    });
   }
 
   performJump() {
     this.isJumping = true;
     this.gameState = 'JUMPING';
+    this.charSprite.play('jump');
     window.gameSound.playJump();
 
     const startX = this.charContainer.x;

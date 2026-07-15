@@ -86,8 +86,8 @@ class TitleScene extends Phaser.Scene {
     });
 
     // Walking character
-    const char = this.add.sprite(120, 400, 'character');
-    char.setScale(0.35);
+    const char = this.add.sprite(120, 400, 'char_0');
+    char.setScale(0.7);
     char.play('walk');
     this.tweens.add({
       targets: char,

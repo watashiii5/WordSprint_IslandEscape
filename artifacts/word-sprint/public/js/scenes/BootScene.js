@@ -4,7 +4,6 @@ class BootScene extends Phaser.Scene {
   }
 
   preload() {
-    // Loading bar
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
     const barBg = this.add.graphics();
@@ -37,17 +36,13 @@ class BootScene extends Phaser.Scene {
     this.load.image('beach_bg', 'assets/beach_bg.jpg');
     this.load.image('wooden_sign', 'assets/wooden_sign.jpg');
     this.load.image('stone_platform', 'assets/stone_platform.jpg');
-    
-    this.load.spritesheet('character', 'assets/character.png', {
-      frameWidth: 352,
-      frameHeight: 192
-    });
   }
 
   create() {
     window.gameSound.init();
     this.generateTextures();
     this.generateParticles();
+    this.generateCharacterSheet();
     this.createAnimations();
     this.scene.start('TitleScene');
   }
@@ -55,7 +50,6 @@ class BootScene extends Phaser.Scene {
   generateTextures() {
     const g = this.add.graphics();
 
-    // --- Ground platform ---
     g.clear();
     g.fillStyle(0x8B6914, 1);
     g.fillRoundedRect(0, 0, 64, 64, 8);
@@ -69,7 +63,6 @@ class BootScene extends Phaser.Scene {
     g.strokeRoundedRect(0, 0, 64, 64, 8);
     g.generateTexture('ground', 64, 64);
 
-    // --- Water ---
     g.clear();
     g.fillStyle(0x3498db, 1);
     g.fillRect(0, 0, 64, 64);
@@ -80,7 +73,6 @@ class BootScene extends Phaser.Scene {
     g.fillRect(36, 10, 18, 5);
     g.generateTexture('water', 64, 64);
 
-    // --- Cloud ---
     g.clear();
     g.fillStyle(0xffffff, 0.95);
     g.fillCircle(50, 30, 22);
@@ -92,7 +84,6 @@ class BootScene extends Phaser.Scene {
     g.fillCircle(50, 38, 20);
     g.generateTexture('cloud', 100, 56);
 
-    // --- Tree trunk ---
     g.clear();
     g.fillStyle(0x6D4C2A, 1);
     g.fillRoundedRect(6, 0, 12, 48, 3);
@@ -100,7 +91,6 @@ class BootScene extends Phaser.Scene {
     g.fillRect(8, 4, 3, 40);
     g.generateTexture('trunk', 24, 48);
 
-    // --- Tree leaves ---
     g.clear();
     g.fillStyle(0x27ae60, 1);
     g.fillCircle(22, 18, 18);
@@ -113,32 +103,6 @@ class BootScene extends Phaser.Scene {
     g.fillCircle(30, 28, 8);
     g.generateTexture('leaves', 44, 40);
 
-    // --- Character body ---
-    g.clear();
-    g.fillStyle(0x2980b9, 1);
-    g.fillRoundedRect(-10, -14, 20, 28, 6);
-    g.fillStyle(0x3498db, 0.5);
-    g.fillRect(-6, -10, 12, 20);
-    g.fillStyle(0xf1c40f, 1);
-    g.fillRoundedRect(-4, -6, 8, 14, 3);
-    g.generateTexture('charBody', 20, 28);
-
-    // --- Character head ---
-    g.clear();
-    g.fillStyle(0xf5cba7, 1);
-    g.fillCircle(0, 0, 12);
-    g.fillStyle(0x6D4C2A, 1);
-    g.fillRoundedRect(-10, -12, 20, 10, 5);
-    g.fillStyle(0x000000, 1);
-    g.fillCircle(-4, 0, 2);
-    g.fillCircle(4, 0, 2);
-    g.lineStyle(2, 0xc0392b, 1);
-    g.beginPath();
-    g.arc(0, 4, 5, 0, Math.PI, false);
-    g.strokePath();
-    g.generateTexture('charHead', 24, 24);
-
-    // --- Answer platform (default - blue) ---
     g.clear();
     g.fillStyle(0x2c3e50, 1);
     g.fillRoundedRect(0, 0, 160, 50, 14);
@@ -148,7 +112,6 @@ class BootScene extends Phaser.Scene {
     g.strokeRoundedRect(0, 0, 160, 50, 14);
     g.generateTexture('platform', 160, 50);
 
-    // --- Answer platform (correct - green) ---
     g.clear();
     g.fillStyle(0x1e8449, 1);
     g.fillRoundedRect(0, 0, 160, 50, 14);
@@ -158,7 +121,6 @@ class BootScene extends Phaser.Scene {
     g.strokeRoundedRect(0, 0, 160, 50, 14);
     g.generateTexture('platformGreen', 160, 50);
 
-    // --- Answer platform (wrong - red) ---
     g.clear();
     g.fillStyle(0x922b21, 1);
     g.fillRoundedRect(0, 0, 160, 50, 14);
@@ -196,31 +158,167 @@ class BootScene extends Phaser.Scene {
     arrow.destroy();
   }
 
+  generateCharacterSheet() {
+    const fW = 128;
+    const fH = 128;
+    const numFrames = 8;
+
+    for (let f = 0; f < numFrames; f++) {
+      const ct = this.textures.createCanvas('char_' + f, fW, fH);
+      const ctx = ct.context;
+      this.drawCharacterFrame(ctx, fW, fH, f);
+      ct.refresh();
+    }
+  }
+
+  drawCharacterFrame(ctx, w, h, frame) {
+    const cx = w / 2;
+    const ground = h - 8;
+
+    let bodyDy = 0;
+    let ll = 0, rl = 0;
+    let la = 0, ra = 0;
+
+    if (frame < 4) {
+      const a = (frame / 4) * Math.PI * 2;
+      ll = Math.sin(a) * 22;
+      rl = Math.sin(a + Math.PI) * 22;
+      la = Math.sin(a + Math.PI) * 15;
+      ra = Math.sin(a) * 15;
+      bodyDy = Math.abs(Math.sin(a * 2)) * 2;
+    } else if (frame === 5) {
+      ll = 15; rl = -15; bodyDy = 5;
+    } else if (frame === 6) {
+      ll = 30; rl = -30; bodyDy = 15; la = -30; ra = -30;
+    } else if (frame === 7) {
+      ll = -10; rl = 10; bodyDy = 2;
+    }
+
+    const headR = 11;
+    const bw = 18, bh = 22;
+    const legL = 18;
+    const armL = 16;
+
+    const by = ground - legL - bh / 2 + bodyDy;
+    const hy = by - bh / 2 - headR + 2;
+
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(cx, ground + 3, 12, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    this._drawLimb(ctx, cx - 4, by + bh / 2, 6, legL, ll, '#37474F', '#795548');
+    this._drawLimb(ctx, cx + 4, by + bh / 2, 6, legL, rl, '#37474F', '#795548');
+
+    ctx.fillStyle = '#2196F3';
+    this._fillRoundRect(ctx, cx - bw / 2, by - bh / 2, bw, bh, 4);
+    ctx.fill();
+    ctx.fillStyle = '#1976D2';
+    ctx.fillRect(cx - 1, by - bh / 2 + 3, 2, bh - 6);
+
+    this._drawArm(ctx, cx - bw / 2, by - bh / 4, armL, la, '#2196F3', '#f5cba7');
+    this._drawArm(ctx, cx + bw / 2, by - bh / 4, armL, ra, '#2196F3', '#f5cba7');
+
+    ctx.fillStyle = '#f5cba7';
+    ctx.beginPath();
+    ctx.arc(cx, hy, headR, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#5D4037';
+    ctx.beginPath();
+    ctx.arc(cx, hy - 2, headR + 1, Math.PI + 0.4, -0.4);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx - 4, hy - 1, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx + 4, hy - 1, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#212121';
+    ctx.beginPath();
+    ctx.arc(cx - 4, hy - 1, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx + 4, hy - 1, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#c62828';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (frame >= 5 && frame <= 6) {
+      ctx.arc(cx, hy + 5, 2.5, 0, Math.PI * 2);
+    } else {
+      ctx.arc(cx, hy + 4, 3, 0.2, Math.PI - 0.2);
+    }
+    ctx.stroke();
+  }
+
+  _drawLimb(ctx, x, y, w, h, angle, c1, c2) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle * Math.PI / 180);
+    ctx.fillStyle = c1;
+    ctx.fillRect(-w / 2, 0, w, h * 0.7);
+    ctx.fillStyle = c2;
+    ctx.fillRect(-w / 2 - 0.5, h * 0.7, w + 1, h * 0.3);
+    ctx.restore();
+  }
+
+  _drawArm(ctx, x, y, len, angle, c1, c2) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle * Math.PI / 180);
+    ctx.fillStyle = c1;
+    ctx.fillRect(-2, 0, 4, len * 0.55);
+    ctx.fillStyle = c2;
+    ctx.fillRect(-2, len * 0.55, 4, len * 0.45);
+    ctx.restore();
+  }
+
+  _fillRoundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
   createAnimations() {
     this.anims.create({
       key: 'walk',
-      frames: this.anims.generateFrameNumbers('character', { start: 0, end: 3 }),
+      frames: [
+        { key: 'char_0' },
+        { key: 'char_1' },
+        { key: 'char_2' },
+        { key: 'char_3' }
+      ],
       frameRate: 8,
       repeat: -1
     });
 
     this.anims.create({
       key: 'idle',
-      frames: [{ key: 'character', frame: 4 }],
+      frames: [{ key: 'char_4' }],
       frameRate: 1
     });
 
     this.anims.create({
       key: 'jump',
-      frames: this.anims.generateFrameNumbers('character', { start: 8, end: 10 }),
+      frames: [
+        { key: 'char_5' },
+        { key: 'char_6' },
+        { key: 'char_7' }
+      ],
       frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: 'trip',
-      frames: this.anims.generateFrameNumbers('character', { start: 12, end: 15 }),
-      frameRate: 8,
       repeat: 0
     });
   }
