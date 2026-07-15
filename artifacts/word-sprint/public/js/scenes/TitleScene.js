@@ -99,7 +99,7 @@ class TitleScene extends Phaser.Scene {
 
     // Logo
     const logo = this.add.image(480, 150, 'logo');
-    logo.setScale(Phaser.Math.Min(700 / logo.width, 250 / logo.height));
+    logo.setScale(Math.min(700 / logo.width, 250 / logo.height));
     logo.setOrigin(0.5);
     logo.setAlpha(0);
     this.tweens.add({
