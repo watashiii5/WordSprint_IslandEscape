@@ -28,12 +28,10 @@ class GameScene extends Phaser.Scene {
   createBackground() {
     const worldWidth = this.totalQuestions * (this.PLATFORM_WIDTH + this.GAP_WIDTH) + this.WORLD_PADDING * 2;
 
-    // Beach background image (tiled across world)
     const bgImg = this.add.image(0, 0, 'beach_bg').setOrigin(0, 0);
     bgImg.setDisplaySize(worldWidth, 540);
     bgImg.setScrollFactor(0.1);
 
-    // Sky gradient overlay (warm sunset/sunrise vibe)
     const bg = this.add.graphics();
     for (let i = 0; i < 540; i++) {
       const t = i / 540;
@@ -44,7 +42,6 @@ class GameScene extends Phaser.Scene {
       bg.fillRect(0, i, worldWidth, 1);
     }
 
-    // Sun
     const sun = this.add.circle(800, 150, 60, 0xffeaa7);
     sun.setScrollFactor(0.05);
     this.tweens.add({
@@ -57,7 +54,6 @@ class GameScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // Clouds
     for (let i = 0; i < Math.ceil(worldWidth / 250); i++) {
       const cloud = this.add.image(i * 250 + Phaser.Math.Between(-50, 50), Phaser.Math.Between(40, 160), 'cloud');
       cloud.setAlpha(Phaser.Math.FloatBetween(0.6, 0.9));
@@ -74,7 +70,6 @@ class GameScene extends Phaser.Scene {
       });
     }
 
-    // Distant mountains
     const mtKey = 'mountains_' + worldWidth;
     if (!this.textures.exists(mtKey)) {
       const mountains = this.add.graphics();
@@ -101,7 +96,6 @@ class GameScene extends Phaser.Scene {
       const plat = this.platforms.create(x, this.GROUND_Y, 'ground').setDepth(10);
       plat.setScale(1, 1).refreshBody();
       
-      // Floating animation for platforms
       this.tweens.add({
         targets: plat,
         y: plat.y + 4,
@@ -120,11 +114,9 @@ class GameScene extends Phaser.Scene {
       }
     }
 
-    // Water under gaps
     for (const gap of this.gaps) {
       for (let wx = gap.x - this.GAP_WIDTH / 2; wx < gap.x + this.GAP_WIDTH / 2; wx += 64) {
         const w = this.add.image(wx, this.GROUND_Y + 28, 'water').setDepth(2);
-        // Gentle wave tween
         this.tweens.add({
           targets: w,
           y: w.y + 6,
@@ -136,7 +128,6 @@ class GameScene extends Phaser.Scene {
       }
     }
 
-    // Decorations
     for (let i = 0; i < this.totalQuestions + 1; i++) {
       const x = this.WORLD_PADDING + i * (this.PLATFORM_WIDTH + this.GAP_WIDTH);
       if (Phaser.Math.Between(0, 1) === 0) {
@@ -144,7 +135,6 @@ class GameScene extends Phaser.Scene {
         this.add.image(treeX, this.GROUND_Y - 30, 'trunk').setDepth(12);
         const leaves = this.add.image(treeX, this.GROUND_Y - 55, 'leaves').setDepth(12);
         
-        // Wind effect on leaves
         this.tweens.add({
           targets: leaves,
           angle: Phaser.Math.Between(-3, 3),
@@ -162,8 +152,8 @@ class GameScene extends Phaser.Scene {
 
     this.charShadow = this.add.ellipse(0, 34, 24, 8, 0x000000, 0.3);
 
-    this.charSprite = this.add.sprite(0, 0, 'char_4');
-    this.charSprite.setScale(0.7);
+    this.charSprite = this.add.sprite(0, 0, 'character', 4);
+    this.charSprite.setScale(0.35);
 
     this.charContainer.add([this.charShadow, this.charSprite]);
 
@@ -175,7 +165,6 @@ class GameScene extends Phaser.Scene {
     this.isJumping = false;
     this.walkTween = null;
     
-    // Dust particles
     this.dustEmitter = this.add.particles(0, 0, 'particle', {
         x: { onEmit: () => this.charContainer.x, onUpdate: () => this.charContainer.x },
         y: { onEmit: () => this.charContainer.y + 30, onUpdate: () => this.charContainer.y + 30 },
@@ -193,7 +182,6 @@ class GameScene extends Phaser.Scene {
   createUI() {
     const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
-    // Score display
     this.scoreText = this.add.text(20, 20, `Score: 0 / ${this.totalQuestions}`, {
       fontSize: '26px',
       fontFamily: fontFamily,
@@ -204,7 +192,6 @@ class GameScene extends Phaser.Scene {
       shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 4, stroke: false, fill: true }
     }).setScrollFactor(0).setDepth(100);
 
-    // Question prompt (using wooden_sign asset)
     this.promptSign = this.add.image(480, 70, 'wooden_sign')
       .setDisplaySize(720, 110)
       .setScrollFactor(0)
@@ -222,15 +209,15 @@ class GameScene extends Phaser.Scene {
       align: 'center'
     }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
 
-    // Answer platforms
     this.answerPlatforms = [];
     this.answerTexts = [];
 
     for (let i = 0; i < 3; i++) {
       const x = 280 + i * 200;
-      const platContainer = this.add.container(x, this.QUESTION_PLATFORM_Y).setScrollFactor(0).setDepth(90).setVisible(false);
+      const platContainer = this.add.container(x, this.QUESTION_PLATFORM_Y)
+        .setScrollFactor(0).setDepth(90).setVisible(false);
       
-      const plat = this.add.image(0, 0, 'platform').setInteractive({ useHandCursor: true });
+      const plat = this.add.image(0, 0, 'platform');
       
       const txt = this.add.text(0, 0, '', {
         fontSize: '22px',
@@ -242,26 +229,48 @@ class GameScene extends Phaser.Scene {
       }).setOrigin(0.5);
 
       platContainer.add([plat, txt]);
-      
-      plat.on('pointerdown', () => this.handleAnswer(i));
-      plat.on('pointerover', () => {
-        if (this.gameState === 'QUESTION') {
-            this.tweens.add({ targets: platContainer, scale: 1.1, duration: 150, ease: 'Back.easeOut' });
-            plat.setTint(0xe0e0e0);
-        }
-      });
-      plat.on('pointerout', () => {
-        if (this.gameState === 'QUESTION') {
-            this.tweens.add({ targets: platContainer, scale: 1, duration: 150, ease: 'Power1' });
-            plat.clearTint();
-        }
-      });
 
       this.answerPlatforms.push({ container: platContainer, image: plat });
       this.answerTexts.push(txt);
     }
 
-    // Hint text
+    this.input.on('pointerdown', (pointer) => {
+      if (this.gameState !== 'QUESTION') return;
+      for (let i = 0; i < 3; i++) {
+        const container = this.answerPlatforms[i].container;
+        if (!container.visible) continue;
+        const bounds = container.getBounds();
+        if (pointer.x >= bounds.left && pointer.x <= bounds.right &&
+            pointer.y >= bounds.top && pointer.y <= bounds.bottom) {
+          this.handleAnswer(i);
+          break;
+        }
+      }
+    });
+
+    this.input.on('pointermove', (pointer) => {
+      if (this.gameState !== 'QUESTION') return;
+      for (let i = 0; i < 3; i++) {
+        const container = this.answerPlatforms[i].container;
+        const plat = this.answerPlatforms[i].image;
+        if (!container.visible) continue;
+        const bounds = container.getBounds();
+        const over = pointer.x >= bounds.left && pointer.x <= bounds.right &&
+                     pointer.y >= bounds.top && pointer.y <= bounds.bottom;
+        if (over && !this._hoveredBtn) {
+          this._hoveredBtn = i;
+          this.tweens.add({ targets: container, scale: 1.1, duration: 150, ease: 'Back.easeOut' });
+          plat.setTint(0xe0e0e0);
+        } else if (!over && this._hoveredBtn === i) {
+          this._hoveredBtn = null;
+          this.tweens.add({ targets: container, scale: 1, duration: 150, ease: 'Power1' });
+          plat.clearTint();
+        }
+      }
+    });
+
+    this._hoveredBtn = null;
+
     this.hintText = this.add.text(480, 310, '', {
       fontSize: '20px',
       fontFamily: fontFamily,
@@ -274,7 +283,6 @@ class GameScene extends Phaser.Scene {
       align: 'center'
     }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
 
-    // Arrow hint
     this.arrow = this.add.image(900, this.GROUND_Y - 80, 'arrow')
       .setScrollFactor(0)
       .setDepth(80)
@@ -289,7 +297,6 @@ class GameScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
     
-    // Sparkle Emitter (for correct answers)
     this.sparkleEmitter = this.add.particles(0, 0, 'sparkle', {
         speed: { min: 50, max: 150 },
         angle: { min: 0, max: 360 },
@@ -327,7 +334,7 @@ class GameScene extends Phaser.Scene {
     this.charContainer.body.setVelocityX(0);
     this.dustEmitter.stop();
     this.charSprite.stop();
-    this.charSprite.setTexture('char_4');
+    this.charSprite.setFrame(4);
     if (this.walkTween) {
       this.walkTween.stop();
       this.charContainer.y = this.GROUND_Y - 48;
@@ -349,6 +356,7 @@ class GameScene extends Phaser.Scene {
   triggerQuestion(index) {
     this.currentQuestion = index;
     this.gameState = 'QUESTION';
+    this._hoveredBtn = null;
     this.stopWalking();
     this.charSprite.play('idle');
 
@@ -362,14 +370,12 @@ class GameScene extends Phaser.Scene {
       const plat = this.answerPlatforms[i];
       plat.container.setVisible(true).setAlpha(1).setScale(1).setY(this.QUESTION_PLATFORM_Y + 50);
       plat.image.setTexture('platform').clearTint();
-      plat.image.input.enabled = true;
       this.answerTexts[i].setText(q.options[i]).setVisible(true).setColor('#ffffff');
     }
 
     this.hintText.setVisible(false);
     this.arrow.setAlpha(0);
 
-    // Bouncy entrance
     this.promptText.scaleX = 0;
     this.promptText.scaleY = 0;
     this.tweens.add({
@@ -409,7 +415,6 @@ class GameScene extends Phaser.Scene {
       this.score++;
       window.gameSound.playCorrect();
       
-      // Score animation
       this.scoreText.setText(`Score: ${this.score} / ${this.totalQuestions}`);
       this.tweens.add({
           targets: this.scoreText,
@@ -425,7 +430,6 @@ class GameScene extends Phaser.Scene {
 
       this.gameState = 'CORRECT';
       
-      // Emit sparkles relative to the screen position of the platform
       this.sparkleEmitter.emitParticleAt(plat.container.x, plat.container.y, 30);
 
       this.time.delayedCall(700, () => {
@@ -442,7 +446,6 @@ class GameScene extends Phaser.Scene {
       this.hintText.scale = 0;
       this.tweens.add({ targets: this.hintText, scale: 1, duration: 300, ease: 'Back.easeOut' });
 
-      // Screen shake and character shake
       this.cameras.main.shake(300, 0.005);
       this.tweens.add({
         targets: this.charContainer,
@@ -479,7 +482,6 @@ class GameScene extends Phaser.Scene {
     });
 
     for (let i = 0; i < 3; i++) {
-        this.answerPlatforms[i].image.input.enabled = false;
         this.tweens.killTweensOf(this.answerPlatforms[i].container);
         this.tweens.add({
             targets: this.answerPlatforms[i].container,
@@ -519,7 +521,6 @@ class GameScene extends Phaser.Scene {
     const jumpHeight = 160;
     const jumpDistance = this.GAP_WIDTH + 75;
 
-    // Flip char slightly during jump
     this.tweens.add({
         targets: this.charContainer,
         angle: 15,
@@ -528,7 +529,6 @@ class GameScene extends Phaser.Scene {
         ease: 'Sine.easeInOut'
     });
     
-    // Shrink shadow
     this.tweens.add({
         targets: this.charShadow,
         scale: 0.3,
@@ -554,7 +554,6 @@ class GameScene extends Phaser.Scene {
         this.charContainer.angle = 0;
         window.gameSound.playLand();
 
-        // Landing dust
         this.dustEmitter.emitParticleAt(this.charContainer.x, this.charContainer.y + 30, 10);
 
         if (this.currentQuestion >= this.totalQuestions - 1) {
