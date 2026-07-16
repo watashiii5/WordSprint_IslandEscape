@@ -8,7 +8,7 @@ class GameScene extends Phaser.Scene {
     this.QUESTION_PLATFORM_Y = 220;
     this.WORLD_PADDING = 200;
     this.CHAR_SCALE = 0.4;
-    this.CHAR_FEET_OFFSET = 68;
+    this.CHAR_FEET_OFFSET = 60;
   }
 
   create(data) {
@@ -16,6 +16,7 @@ class GameScene extends Phaser.Scene {
     this.score = data.score || 0;
     this.currentQuestion = 0;
     this.gameState = 'RUNNING';
+    this._hideDelay = null;
 
     const levelData = this.cache.json.get('questions');
     this.levelInfo = levelData.levels[this.currentLevel];
@@ -101,8 +102,6 @@ class GameScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
     this.gaps = [];
 
-    const worldWidth = this.totalQuestions * (this.PLATFORM_WIDTH + this.GAP_WIDTH) + this.WORLD_PADDING * 2;
-
     for (let i = 0; i <= this.totalQuestions; i++) {
       const x = this.WORLD_PADDING + i * (this.PLATFORM_WIDTH + this.GAP_WIDTH);
       const plat = this.platforms.create(x, this.GROUND_Y, 'ground').setDepth(10);
@@ -163,10 +162,11 @@ class GameScene extends Phaser.Scene {
     const charY = this.GROUND_Y - this.CHAR_FEET_OFFSET;
     this.charContainer = this.add.container(this.WORLD_PADDING, charY).setDepth(15);
 
-    this.charShadow = this.add.ellipse(0, this.CHAR_FEET_OFFSET, 24, 8, 0x000000, 0.3);
+    this.charShadow = this.add.ellipse(0, this.CHAR_FEET_OFFSET - 2, 24, 8, 0x000000, 0.3);
 
     this.charSprite = this.add.sprite(0, 0, 'character', 5);
     this.charSprite.setScale(this.CHAR_SCALE);
+    this.charSprite.setOrigin(0.5, 0.45);
 
     this.charContainer.add([this.charShadow, this.charSprite]);
 
@@ -248,7 +248,9 @@ class GameScene extends Phaser.Scene {
         fontWeight: 'bold',
         color: '#ffffff',
         stroke: '#2c3e50',
-        strokeThickness: 4
+        strokeThickness: 4,
+        wordWrap: { width: 140 },
+        align: 'center'
       }).setOrigin(0.5);
 
       platContainer.add([plat, txt]);
@@ -427,6 +429,7 @@ class GameScene extends Phaser.Scene {
   }
 
   triggerQuestion(index) {
+    this.cancelPendingHide();
     this.currentQuestion = index;
     this.gameState = 'QUESTION';
     this._hoveredBtn = null;
@@ -435,8 +438,8 @@ class GameScene extends Phaser.Scene {
 
     const q = this.questions[index];
 
-    this.promptSign.setVisible(true).setAlpha(0);
-    this.promptText.setText(`${index + 1}. ${q.prompt}`).setVisible(true);
+    this.promptSign.setVisible(true).setAlpha(0).setScale(1);
+    this.promptText.setText(`${index + 1}. ${q.prompt}`).setVisible(true).setAlpha(0).setScale(1);
 
     for (let i = 0; i < 3; i++) {
       this.tweens.killTweensOf(this.answerPlatforms[i].container);
@@ -449,8 +452,6 @@ class GameScene extends Phaser.Scene {
     this.hintText.setVisible(false);
     this.arrow.setAlpha(0);
 
-    this.promptText.scaleX = 0;
-    this.promptText.scaleY = 0;
     this.tweens.add({
       targets: [this.promptSign],
       alpha: 1,
@@ -459,10 +460,9 @@ class GameScene extends Phaser.Scene {
     });
     this.tweens.add({
       targets: [this.promptText],
-      scale: 1,
-      duration: 400,
-      delay: 100,
-      ease: 'Back.easeOut'
+      alpha: 1,
+      duration: 300,
+      ease: 'Power2'
     });
 
     for (let i = 0; i < 3; i++) {
@@ -474,6 +474,13 @@ class GameScene extends Phaser.Scene {
             delay: 200 + i * 100,
             ease: 'Back.easeOut'
         });
+    }
+  }
+
+  cancelPendingHide() {
+    if (this._hideDelay) {
+      this._hideDelay.remove(false);
+      this._hideDelay = null;
     }
   }
 
@@ -550,16 +557,13 @@ class GameScene extends Phaser.Scene {
   }
 
   hideQuestionUI() {
+    this.cancelPendingHide();
+
     this.tweens.add({
         targets: [this.promptSign, this.promptText, this.hintText],
         alpha: 0,
         duration: 200,
-        ease: 'Power2',
-        onComplete: () => {
-            this.promptSign.setVisible(false);
-            this.promptText.setVisible(false);
-            this.hintText.setVisible(false);
-        }
+        ease: 'Power2'
     });
 
     for (let i = 0; i < 3; i++) {
@@ -570,16 +574,11 @@ class GameScene extends Phaser.Scene {
             scale: 1,
             y: this.QUESTION_PLATFORM_Y - 20,
             duration: 200,
-            ease: 'Power2',
-            onComplete: () => {
-                this.answerPlatforms[i].container.setVisible(false);
-                this.answerPlatforms[i].container.setScale(1);
-                this.answerPlatforms[i].container.setAlpha(0);
-            }
+            ease: 'Power2'
         });
     }
 
-    this.time.delayedCall(300, () => {
+    this._hideDelay = this.time.delayedCall(300, () => {
         for (let i = 0; i < 3; i++) {
             this.answerPlatforms[i].container.setVisible(false);
             this.answerPlatforms[i].container.setAlpha(0);
@@ -588,6 +587,7 @@ class GameScene extends Phaser.Scene {
         this.promptSign.setVisible(false);
         this.promptText.setVisible(false);
         this.hintText.setVisible(false);
+        this._hideDelay = null;
     });
   }
 
@@ -630,7 +630,7 @@ class GameScene extends Phaser.Scene {
       ease: 'Linear',
       onUpdate: () => {
         const progress = (this.charContainer.x - startX) / jumpDistance;
-        const arc = -4 * jumpHeight * progress * (progress - 1);
+        const arc = 4 * jumpHeight * progress * (progress - 1);
         this.charContainer.y = startY + arc;
       },
       onComplete: () => {
