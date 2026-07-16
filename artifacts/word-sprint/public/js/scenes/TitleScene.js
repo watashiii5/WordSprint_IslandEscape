@@ -4,7 +4,7 @@ class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    const fontFamily = '"Press Start 2P", monospace';
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
     const bg = this.add.graphics();
     for (let i = 0; i < 540; i++) {
@@ -42,7 +42,7 @@ class TitleScene extends Phaser.Scene {
     }
 
     const mountains = this.add.graphics();
-    mountains.fillStyle(0x34495e, 1);
+    mountains.fillStyle(0x34495e, 0.5);
     for (let x = 0; x < 960; x += 150) {
       const h = Phaser.Math.Between(80, 160);
       mountains.fillTriangle(x, 440, x + 100, 440 - h, x + 250, 440);
@@ -102,11 +102,13 @@ class TitleScene extends Phaser.Scene {
     });
 
     const subtitle = this.add.text(480, 270, 'Jump across the island by answering vocabulary questions!', {
-      fontSize: '14px',
+      fontSize: '20px',
       fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff',
-      stroke: '#000000',
+      stroke: '#2c3e50',
       strokeThickness: 4,
+      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 3, fill: true }
     }).setOrigin(0.5).setAlpha(0);
 
     this.tweens.add({
@@ -120,16 +122,18 @@ class TitleScene extends Phaser.Scene {
 
     const btnBg = this.add.graphics();
     btnBg.fillStyle(0xe67e22, 1);
-    btnBg.fillRect(-120, -35, 240, 70);
+    btnBg.fillRoundedRect(-120, -35, 240, 70, 18);
     btnBg.lineStyle(4, 0xf39c12, 1);
-    btnBg.strokeRect(-120, -35, 240, 70);
+    btnBg.strokeRoundedRect(-120, -35, 240, 70, 18);
 
     const btnText = this.add.text(0, 0, 'START GAME', {
-      fontSize: '20px',
+      fontSize: '30px',
       fontFamily: fontFamily,
+      fontWeight: '900',
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 4,
+      shadow: { offsetX: 0, offsetY: 3, color: '#000000', blur: 3, fill: true }
     }).setOrigin(0.5);
 
     btnContainer.add([btnBg, btnText]);
@@ -141,18 +145,18 @@ class TitleScene extends Phaser.Scene {
       this.tweens.add({ targets: btnContainer, scale: 1.1, duration: 150, ease: 'Back.easeOut' });
       btnBg.clear();
       btnBg.fillStyle(0xf39c12, 1);
-      btnBg.fillRect(-120, -35, 240, 70);
+      btnBg.fillRoundedRect(-120, -35, 240, 70, 18);
       btnBg.lineStyle(4, 0xe67e22, 1);
-      btnBg.strokeRect(-120, -35, 240, 70);
+      btnBg.strokeRoundedRect(-120, -35, 240, 70, 18);
     });
 
     btnZone.on('pointerout', () => {
       this.tweens.add({ targets: btnContainer, scale: 1, duration: 150, ease: 'Power1' });
       btnBg.clear();
       btnBg.fillStyle(0xe67e22, 1);
-      btnBg.fillRect(-120, -35, 240, 70);
+      btnBg.fillRoundedRect(-120, -35, 240, 70, 18);
       btnBg.lineStyle(4, 0xf39c12, 1);
-      btnBg.strokeRect(-120, -35, 240, 70);
+      btnBg.strokeRoundedRect(-120, -35, 240, 70, 18);
     });
 
     btnZone.on('pointerdown', () => {
@@ -184,10 +188,10 @@ class TitleScene extends Phaser.Scene {
     });
 
     const instructions = this.add.text(480, 450, '3 levels of increasing challenge — can you escape the island?', {
-      fontSize: '12px',
+      fontSize: '16px',
       fontFamily: fontFamily,
       color: '#ecf0f1',
-      stroke: '#000000',
+      stroke: '#2c3e50',
       strokeThickness: 3,
       align: 'center'
     }).setOrigin(0.5).setAlpha(0);

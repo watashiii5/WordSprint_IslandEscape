@@ -9,6 +9,7 @@ class SuccessScene extends Phaser.Scene {
 
     const score = data.score || 0;
     const total = data.total || 15;
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
     const bg = this.add.graphics();
     bg.fillGradientStyle(0x1a0533, 0x1a0533, 0x000033, 0x000033, 1);
@@ -18,7 +19,7 @@ class SuccessScene extends Phaser.Scene {
       const star = this.add.graphics();
       star.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.5, 1));
       const size = Phaser.Math.Between(1, 3);
-      star.fillRect(0, 0, size, size);
+      star.fillCircle(0, 0, size);
       star.setPosition(Phaser.Math.Between(0, 960), Phaser.Math.Between(0, 350));
       
       this.tweens.add({
@@ -33,11 +34,12 @@ class SuccessScene extends Phaser.Scene {
 
     const title = this.add.text(480, 80, 'VICTORY!', {
       fontSize: '64px',
-      fontFamily: '"Press Start 2P", monospace',
+      fontFamily: fontFamily,
+      fontWeight: '900',
       color: '#f1c40f',
       stroke: '#000000',
       strokeThickness: 8,
-      shadow: { offsetX: 4, offsetY: 4, color: '#000000', blur: 0, fill: true }
+      shadow: { offsetX: 4, offsetY: 4, color: '#000000', blur: 6, fill: true }
     }).setOrigin(0.5).setAlpha(0);
 
     this.tweens.add({
@@ -63,29 +65,31 @@ class SuccessScene extends Phaser.Scene {
 
     const box = this.add.graphics();
     box.fillStyle(0x000000, 0.7);
-    box.fillRect(280, 160, 400, 120);
+    box.fillRoundedRect(280, 160, 400, 120, 20);
     box.lineStyle(4, 0xf1c40f, 0.8);
-    box.strokeRect(280, 160, 400, 120);
+    box.strokeRoundedRect(280, 160, 400, 120, 20);
 
     this.add.text(480, 200, `Score: ${score} / ${total}`, {
       fontSize: '32px',
-      fontFamily: '"Press Start 2P", monospace',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    const messageText = score === total ? 'PERFECT!' : 'GREAT JOB!';
+    const messageText = score === total ? 'Perfect! You escaped the island!' : 'Nice work! Keep practicing!';
     const message = this.add.text(480, 250, messageText, {
       fontSize: '20px',
-      fontFamily: '"Press Start 2P", monospace',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#f1c40f'
     }).setOrigin(0.5);
 
     if (score >= total * 0.5) {
       const starCount = score === total ? 3 : (score >= total * 0.8 ? 2 : 1);
       for (let i = 0; i < 3; i++) {
-        const star = this.add.text(410 + i * 60, 320, '★', {
+        const star = this.add.text(410 + i * 60, 320, '\u2605', {
           fontSize: '42px',
-          fontFamily: '"Press Start 2P", monospace',
+          fontFamily: fontFamily,
           color: i < starCount ? '#f1c40f' : '#555555',
           stroke: '#000000',
           strokeThickness: 4
@@ -107,13 +111,14 @@ class SuccessScene extends Phaser.Scene {
       const container = this.add.container(480, y);
       const bg = this.add.graphics();
       bg.fillStyle(0x27ae60, 1);
-      bg.fillRect(-120, -25, 240, 50);
+      bg.fillRoundedRect(-120, -25, 240, 50, 12);
       bg.lineStyle(4, 0x2ecc71, 1);
-      bg.strokeRect(-120, -25, 240, 50);
+      bg.strokeRoundedRect(-120, -25, 240, 50, 12);
 
       const txt = this.add.text(0, 0, text, {
-        fontSize: '16px',
-        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '22px',
+        fontFamily: fontFamily,
+        fontWeight: 'bold',
         color: '#ffffff'
       }).setOrigin(0.5);
 
@@ -125,18 +130,18 @@ class SuccessScene extends Phaser.Scene {
         container.setScale(1.1);
         bg.clear();
         bg.fillStyle(0x2ecc71, 1);
-        bg.fillRect(-120, -25, 240, 50);
+        bg.fillRoundedRect(-120, -25, 240, 50, 12);
         bg.lineStyle(4, 0xf1c40f, 1);
-        bg.strokeRect(-120, -25, 240, 50);
+        bg.strokeRoundedRect(-120, -25, 240, 50, 12);
       });
 
       zone.on('pointerout', () => {
         container.setScale(1);
         bg.clear();
         bg.fillStyle(0x27ae60, 1);
-        bg.fillRect(-120, -25, 240, 50);
+        bg.fillRoundedRect(-120, -25, 240, 50, 12);
         bg.lineStyle(4, 0x2ecc71, 1);
-        bg.strokeRect(-120, -25, 240, 50);
+        bg.strokeRoundedRect(-120, -25, 240, 50, 12);
       });
 
       zone.on('pointerdown', () => {

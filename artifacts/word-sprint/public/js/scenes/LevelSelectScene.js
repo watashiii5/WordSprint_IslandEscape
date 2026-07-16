@@ -4,7 +4,7 @@ class LevelSelectScene extends Phaser.Scene {
   }
 
   create() {
-    const fontFamily = '"Press Start 2P", monospace';
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
     const bg = this.add.graphics();
     for (let i = 0; i < 540; i++) {
@@ -45,16 +45,17 @@ class LevelSelectScene extends Phaser.Scene {
     }
 
     const title = this.add.text(480, 70, 'Select Level', {
-      fontSize: '36px', fontFamily: fontFamily,
+      fontSize: '52px', fontFamily: fontFamily, fontWeight: '900',
       color: '#ffffff', stroke: '#000000', strokeThickness: 6,
+      shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 6, fill: true }
     }).setOrigin(0.5).setAlpha(0);
 
     this.tweens.add({ targets: title, alpha: 1, y: 80, duration: 600, ease: 'Back.easeOut' });
 
     const levels = [
-      { name: 'Beach Basics', color: 0x3498db, icon: '1', desc: 'Easy' },
-      { name: 'Tropical Challenge', color: 0xe67e22, icon: '2', desc: 'Medium' },
-      { name: 'Island Master', color: 0xe74c3c, icon: '3', desc: 'Hard' }
+      { name: 'Beach Basics', color: 0x3498db, icon: '1', desc: 'Easy - 5 questions' },
+      { name: 'Tropical Challenge', color: 0xe67e22, icon: '2', desc: 'Medium - 5 questions' },
+      { name: 'Island Master', color: 0xe74c3c, icon: '3', desc: 'Hard - 5 questions' }
     ];
 
     levels.forEach((level, i) => {
@@ -63,26 +64,26 @@ class LevelSelectScene extends Phaser.Scene {
 
       const cardBg = this.add.graphics();
       cardBg.fillStyle(level.color, 1);
-      cardBg.fillRect(-200, -40, 400, 80);
-      cardBg.lineStyle(4, 0xffffff, 0.3);
-      cardBg.strokeRect(-200, -40, 400, 80);
+      cardBg.fillRoundedRect(-200, -40, 400, 80, 16);
+      cardBg.lineStyle(3, 0xffffff, 0.3);
+      cardBg.strokeRoundedRect(-200, -40, 400, 80, 16);
 
       const numText = this.add.text(-170, 0, level.icon, {
-        fontSize: '32px', fontFamily: fontFamily,
+        fontSize: '36px', fontFamily: fontFamily, fontWeight: '900',
         color: '#ffffff', stroke: '#000000', strokeThickness: 3
       }).setOrigin(0, 0.5);
 
       const nameText = this.add.text(-130, -10, level.name, {
-        fontSize: '16px', fontFamily: fontFamily,
+        fontSize: '24px', fontFamily: fontFamily, fontWeight: '900',
         color: '#ffffff', stroke: '#000000', strokeThickness: 3
       }).setOrigin(0, 0.5);
 
       const descText = this.add.text(-130, 14, level.desc, {
-        fontSize: '12px', fontFamily: fontFamily, color: '#ffffff', alpha: 0.8
+        fontSize: '14px', fontFamily: fontFamily, color: '#ffffff', alpha: 0.8
       }).setOrigin(0, 0.5);
 
-      const arrow = this.add.text(170, 0, '▶', {
-        fontSize: '24px', fontFamily: fontFamily, color: '#ffffff'
+      const arrow = this.add.text(170, 0, '\u25B6', {
+        fontSize: '24px', color: '#ffffff'
       }).setOrigin(0.5);
 
       container.add([cardBg, numText, nameText, descText, arrow]);
@@ -94,18 +95,18 @@ class LevelSelectScene extends Phaser.Scene {
         this.tweens.add({ targets: container, scale: 1.05, duration: 150, ease: 'Back.easeOut' });
         cardBg.clear();
         cardBg.fillStyle(level.color, 1);
-        cardBg.fillRect(-200, -40, 400, 80);
-        cardBg.lineStyle(4, 0xffffff, 0.8);
-        cardBg.strokeRect(-200, -40, 400, 80);
+        cardBg.fillRoundedRect(-200, -40, 400, 80, 16);
+        cardBg.lineStyle(3, 0xffffff, 0.8);
+        cardBg.strokeRoundedRect(-200, -40, 400, 80, 16);
       });
 
       zone.on('pointerout', () => {
         this.tweens.add({ targets: container, scale: 1, duration: 150, ease: 'Power1' });
         cardBg.clear();
         cardBg.fillStyle(level.color, 1);
-        cardBg.fillRect(-200, -40, 400, 80);
-        cardBg.lineStyle(4, 0xffffff, 0.3);
-        cardBg.strokeRect(-200, -40, 400, 80);
+        cardBg.fillRoundedRect(-200, -40, 400, 80, 16);
+        cardBg.lineStyle(3, 0xffffff, 0.3);
+        cardBg.strokeRoundedRect(-200, -40, 400, 80, 16);
       });
 
       zone.on('pointerdown', () => {
@@ -123,9 +124,9 @@ class LevelSelectScene extends Phaser.Scene {
       });
     });
 
-    const backBtn = this.add.text(480, 500, '< BACK', {
-      fontSize: '16px', fontFamily: fontFamily,
-      color: '#ecf0f1', stroke: '#000000', strokeThickness: 3
+    const backBtn = this.add.text(480, 500, '\u2190 Back to Menu', {
+      fontSize: '18px', fontFamily: fontFamily, fontWeight: 'bold',
+      color: '#ecf0f1', stroke: '#2c3e50', strokeThickness: 3
     }).setOrigin(0.5).setAlpha(0).setInteractive({ useHandCursor: true });
 
     backBtn.on('pointerover', () => backBtn.setColor('#f1c40f'));

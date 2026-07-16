@@ -11,11 +11,11 @@ class BootScene extends Phaser.Scene {
     barBg.fillRoundedRect(w / 2 - 160, h / 2 - 15, 320, 30, 8);
     const bar = this.add.graphics();
     const loadingText = this.add.text(w / 2, h / 2 - 40, 'Loading...', {
-      fontSize: '16px',
-      fontFamily: '"Press Start 2P", monospace',
+      fontSize: '22px',
+      fontFamily: '"Nunito", Arial, sans-serif',
       color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 4
+      stroke: '#2c3e50',
+      strokeThickness: 3
     }).setOrigin(0.5);
 
     this.load.on('progress', (value) => {
@@ -34,7 +34,6 @@ class BootScene extends Phaser.Scene {
     
     this.load.image('logo', 'assets/logo.png?v=3');
     this.load.image('beach_bg', 'assets/beach_bg.jpg?v=3');
-    this.load.image('wooden_sign', 'assets/wooden_sign.png?v=3');
     this.load.spritesheet('character', 'assets/character_1.png?v=3', {
       frameWidth: 261,
       frameHeight: 341
@@ -131,6 +130,78 @@ class BootScene extends Phaser.Scene {
     g.lineStyle(3, 0xe74c3c, 1);
     g.strokeRoundedRect(0, 0, 160, 50, 14);
     g.generateTexture('platformRed', 160, 50);
+
+    // Wooden sign with parchment overlay (high-quality procedural)
+    const sw = 400, sh = 120;
+    g.clear();
+
+    // Dark wood plank base
+    g.fillStyle(0x3e2012, 1);
+    g.fillRoundedRect(0, 0, sw, sh, 10);
+
+    // Wood grain lines
+    for (let i = 0; i < 30; i++) {
+      const gy = Phaser.Math.Between(5, sh - 5);
+      const gx1 = Phaser.Math.Between(0, sw * 0.3);
+      const gx2 = Phaser.Math.Between(sw * 0.5, sw);
+      g.lineStyle(1, 0x2a1508, Phaser.Math.FloatBetween(0.3, 0.7));
+      g.lineBetween(gx1, gy, gx2, gy + Phaser.Math.Between(-3, 3));
+    }
+
+    // Wood knot holes
+    for (let i = 0; i < 4; i++) {
+      const kx = Phaser.Math.Between(20, sw - 20);
+      const ky = Phaser.Math.Between(10, sh - 10);
+      g.fillStyle(0x1a0d05, 0.6);
+      g.fillCircle(kx, ky, Phaser.Math.Between(3, 6));
+      g.lineStyle(1, 0x2a1508, 0.8);
+      g.strokeCircle(kx, ky, Phaser.Math.Between(4, 7));
+    }
+
+    // Wood frame edges (lighter highlights)
+    g.lineStyle(3, 0x5a3520, 0.8);
+    g.strokeRoundedRect(2, 2, sw - 4, sh - 4, 8);
+    g.lineStyle(1, 0x7a4a30, 0.4);
+    g.strokeRoundedRect(5, 5, sw - 10, sh - 10, 6);
+
+    // Parchment overlay (center)
+    const px = 30, py = 12, pw = sw - 60, ph = sh - 24;
+    g.fillStyle(0xf5e6c8, 1);
+    g.fillRoundedRect(px, py, pw, ph, 6);
+
+    // Parchment aged edges (darker border)
+    g.lineStyle(2, 0xd4c4a0, 0.8);
+    g.strokeRoundedRect(px, py, pw, ph, 6);
+
+    // Parchment curl effect (rolled edges - top and bottom)
+    g.fillStyle(0xe8d8b0, 0.6);
+    g.fillRoundedRect(px, py, pw, 8, { tl: 6, tr: 6, bl: 0, br: 0 });
+    g.fillRoundedRect(px, py + ph - 8, pw, 8, { tl: 0, tr: 0, bl: 6, br: 6 });
+
+    // Parchment inner shadow
+    g.fillStyle(0xc8b890, 0.15);
+    g.fillRoundedRect(px + 3, py + 3, pw - 6, ph - 6, 4);
+
+    // Aged spots on parchment
+    for (let i = 0; i < 8; i++) {
+      const sx = Phaser.Math.Between(px + 10, px + pw - 10);
+      const sy = Phaser.Math.Between(py + 10, py + ph - 10);
+      g.fillStyle(0xd0c0a0, Phaser.Math.FloatBetween(0.1, 0.25));
+      g.fillCircle(sx, sy, Phaser.Math.Between(2, 5));
+    }
+
+    // Corner pins/nails
+    const nailPositions = [[12, 8], [sw - 12, 8], [12, sh - 8], [sw - 12, sh - 8]];
+    nailPositions.forEach(([nx, ny]) => {
+      g.fillStyle(0x888888, 1);
+      g.fillCircle(nx, ny, 4);
+      g.fillStyle(0xaaaaaa, 0.6);
+      g.fillCircle(nx - 1, ny - 1, 2);
+      g.lineStyle(1, 0x555555, 0.8);
+      g.strokeCircle(nx, ny, 4);
+    });
+
+    g.generateTexture('wooden_sign', sw, sh);
 
     g.destroy();
   }

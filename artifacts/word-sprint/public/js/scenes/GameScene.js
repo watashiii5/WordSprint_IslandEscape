@@ -201,42 +201,47 @@ class GameScene extends Phaser.Scene {
   }
 
   createUI() {
-    const fontFamily = '"Press Start 2P", monospace';
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
     this.scoreText = this.add.text(20, 20, `Score: ${this.score} / ${this.totalQuestions * this.totalLevels}`, {
-      fontSize: '16px',
+      fontSize: '26px',
       fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 4,
+      stroke: '#2c3e50',
+      strokeThickness: 5,
+      shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 4, stroke: false, fill: true }
     }).setScrollFactor(0).setDepth(100);
 
-    this.levelText = this.add.text(20, 45, `Level ${this.currentLevel + 1}: ${this.levelInfo.name}`, {
-      fontSize: '12px',
+    this.levelText = this.add.text(20, 52, `Level ${this.currentLevel + 1}: ${this.levelInfo.name}`, {
+      fontSize: '18px',
       fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#f1c40f',
-      stroke: '#000000',
+      stroke: '#2c3e50',
       strokeThickness: 3,
+      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 3, fill: true }
     }).setScrollFactor(0).setDepth(100);
 
     this.hearts = [];
     for (let i = 0; i < 3; i++) {
-      const heart = this.add.text(20 + i * 35, 70, '❤', { fontSize: '24px', fontFamily: fontFamily, color: '#ff0000' })
+      const heart = this.add.text(20 + i * 45, 80, '\u2764', { fontSize: '32px', fontFamily: fontFamily, color: '#ff0000' })
         .setScrollFactor(0).setDepth(100);
       this.hearts.push(heart);
     }
 
     this.promptSign = this.add.image(480, 65, 'wooden_sign')
-      .setDisplaySize(300, 50)
+      .setDisplaySize(340, 55)
       .setScrollFactor(0)
       .setDepth(90)
       .setVisible(false);
 
     this.promptText = this.add.text(480, 65, '', {
-      fontSize: '14px',
+      fontSize: '22px',
       fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff',
-      stroke: '#000000',
+      stroke: '#2c3e50',
       strokeThickness: 4,
       wordWrap: { width: 660 },
       align: 'center'
@@ -253,11 +258,12 @@ class GameScene extends Phaser.Scene {
       const plat = this.add.image(0, 0, 'platform');
 
       const txt = this.add.text(0, 0, '', {
-        fontSize: '12px',
+        fontSize: '22px',
         fontFamily: fontFamily,
+        fontWeight: 'bold',
         color: '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 3,
+        stroke: '#2c3e50',
+        strokeThickness: 4,
         wordWrap: { width: 140 },
         align: 'center'
       }).setOrigin(0.5);
@@ -306,11 +312,13 @@ class GameScene extends Phaser.Scene {
     this._hoveredBtn = null;
 
     this.hintText = this.add.text(480, 310, '', {
-      fontSize: '12px',
+      fontSize: '20px',
       fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffeb3b',
-      stroke: '#000000',
+      stroke: '#c0392b',
       strokeThickness: 4,
+      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 2, fill: true },
       wordWrap: { width: 660 },
       align: 'center'
     }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
@@ -342,32 +350,33 @@ class GameScene extends Phaser.Scene {
   }
 
   createLevelBanner() {
-    const fontFamily = '"Press Start 2P", monospace';
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
     const bannerBg = this.add.graphics()
       .setScrollFactor(0)
       .setDepth(110)
       .setAlpha(0);
 
     const levelLabel = this.add.text(480, 230, `Level ${this.currentLevel + 1}`, {
-      fontSize: '16px',
+      fontSize: '24px',
       fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#f1c40f',
       stroke: '#000000',
       strokeThickness: 4
     }).setOrigin(0.5).setScrollFactor(0).setDepth(111).setAlpha(0);
 
     const levelName = this.add.text(480, 270, this.levelInfo.name, {
-      fontSize: '32px',
+      fontSize: '48px',
       fontFamily: fontFamily,
+      fontWeight: '900',
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 6,
+      shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 6, fill: true }
     }).setOrigin(0.5).setScrollFactor(0).setDepth(111).setAlpha(0);
 
-    bannerBg.fillStyle(0x000000, 0.7);
-    bannerBg.fillRect(230, 210, 500, 100);
-    bannerBg.lineStyle(4, 0xf1c40f, 1);
-    bannerBg.strokeRect(230, 210, 500, 100);
+    bannerBg.fillStyle(0x000000, 0.6);
+    bannerBg.fillRoundedRect(230, 210, 500, 100, 20);
 
     this.tweens.add({
       targets: [bannerBg, levelLabel, levelName],
@@ -708,7 +717,7 @@ class GameScene extends Phaser.Scene {
     this.charSprite.play('celebrate');
     this.charContainer.body.setVelocityX(0);
 
-    const fontFamily = '"Press Start 2P", monospace';
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
     const overlay = this.add.graphics()
       .setScrollFactor(0)
@@ -718,16 +727,19 @@ class GameScene extends Phaser.Scene {
     overlay.fillRect(0, 0, 960, 540);
 
     const completeText = this.add.text(480, 210, 'Level Complete!', {
-      fontSize: '36px',
+      fontSize: '52px',
       fontFamily: fontFamily,
+      fontWeight: '900',
       color: '#2ecc71',
       stroke: '#000000',
       strokeThickness: 6,
+      shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 6, fill: true }
     }).setOrigin(0.5).setScrollFactor(0).setDepth(111).setAlpha(0);
 
     const scoreMsg = this.add.text(480, 280, `Score: ${this.score} / ${this.totalQuestions * this.totalLevels}`, {
-      fontSize: '20px',
+      fontSize: '32px',
       fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 4

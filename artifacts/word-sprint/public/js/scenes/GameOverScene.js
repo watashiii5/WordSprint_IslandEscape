@@ -7,6 +7,8 @@ class GameOverScene extends Phaser.Scene {
     this.cameras.main.fadeIn(500);
     window.gameSound.playWrong();
 
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
+
     const bg = this.add.graphics();
     bg.fillStyle(0x000033, 1);
     bg.fillRect(0, 0, 960, 540);
@@ -15,7 +17,7 @@ class GameOverScene extends Phaser.Scene {
       const star = this.add.graphics();
       star.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.5, 1));
       const size = Phaser.Math.Between(1, 3);
-      star.fillRect(0, 0, size, size);
+      star.fillCircle(0, 0, size);
       const x = Phaser.Math.Between(0, 960);
       const y = Phaser.Math.Between(0, 350);
       star.setPosition(x, y);
@@ -51,11 +53,12 @@ class GameOverScene extends Phaser.Scene {
 
     const gameOverText = this.add.text(480, 120, 'GAME OVER', {
       fontSize: '64px',
-      fontFamily: '"Press Start 2P", monospace',
+      fontFamily: fontFamily,
+      fontWeight: '900',
       color: '#ff0000',
       stroke: '#000000',
       strokeThickness: 8,
-      shadow: { offsetX: 4, offsetY: 4, color: '#000000', blur: 0, fill: true }
+      shadow: { offsetX: 4, offsetY: 4, color: '#000000', blur: 6, fill: true }
     }).setOrigin(0.5).setAlpha(0);
 
     this.tweens.add({
@@ -68,19 +71,21 @@ class GameOverScene extends Phaser.Scene {
 
     const box = this.add.graphics();
     box.fillStyle(0x000000, 0.7);
-    box.fillRect(280, 180, 400, 140);
+    box.fillRoundedRect(280, 180, 400, 140, 20);
     box.lineStyle(4, 0xff0000, 0.8);
-    box.strokeRect(280, 180, 400, 140);
+    box.strokeRoundedRect(280, 180, 400, 140, 20);
 
     this.add.text(480, 210, `Level: ${data.level || 1}`, {
-      fontSize: '24px',
-      fontFamily: '"Press Start 2P", monospace',
+      fontSize: '28px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#ffffff'
     }).setOrigin(0.5);
 
     this.add.text(480, 260, `Score: ${data.score || 0}`, {
-      fontSize: '24px',
-      fontFamily: '"Press Start 2P", monospace',
+      fontSize: '28px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
       color: '#f1c40f'
     }).setOrigin(0.5);
 
@@ -88,13 +93,14 @@ class GameOverScene extends Phaser.Scene {
       const container = this.add.container(480, y);
       const bg = this.add.graphics();
       bg.fillStyle(0x333333, 1);
-      bg.fillRect(-120, -25, 240, 50);
+      bg.fillRoundedRect(-120, -25, 240, 50, 12);
       bg.lineStyle(4, 0xffffff, 0.5);
-      bg.strokeRect(-120, -25, 240, 50);
+      bg.strokeRoundedRect(-120, -25, 240, 50, 12);
 
       const txt = this.add.text(0, 0, text, {
-        fontSize: '18px',
-        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '22px',
+        fontFamily: fontFamily,
+        fontWeight: 'bold',
         color: '#ffffff'
       }).setOrigin(0.5);
 
@@ -106,18 +112,18 @@ class GameOverScene extends Phaser.Scene {
         container.setScale(1.1);
         bg.clear();
         bg.fillStyle(0x555555, 1);
-        bg.fillRect(-120, -25, 240, 50);
+        bg.fillRoundedRect(-120, -25, 240, 50, 12);
         bg.lineStyle(4, 0xf1c40f, 1);
-        bg.strokeRect(-120, -25, 240, 50);
+        bg.strokeRoundedRect(-120, -25, 240, 50, 12);
       });
 
       zone.on('pointerout', () => {
         container.setScale(1);
         bg.clear();
         bg.fillStyle(0x333333, 1);
-        bg.fillRect(-120, -25, 240, 50);
+        bg.fillRoundedRect(-120, -25, 240, 50, 12);
         bg.lineStyle(4, 0xffffff, 0.5);
-        bg.strokeRect(-120, -25, 240, 50);
+        bg.strokeRoundedRect(-120, -25, 240, 50, 12);
       });
 
       zone.on('pointerdown', () => {
