@@ -5,7 +5,7 @@ class SuccessScene extends Phaser.Scene {
 
   create(data) {
     const score = data.score || 0;
-    const total = data.total || 5;
+    const total = data.total || 15;
     const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
     this.cameras.main.fadeIn(400);
@@ -81,7 +81,7 @@ class SuccessScene extends Phaser.Scene {
       shadow: { offsetX: 0, offsetY: 3, color: '#000000', blur: 4, fill: true }
     }).setOrigin(0.5).setAlpha(0).setScale(0.5);
 
-    const messageText = score === total ? 'Perfect! You are a master!' : 'Nice work! Keep practicing!';
+    const messageText = score === total ? 'Perfect! You escaped the island!' : 'Nice work! Keep practicing!';
     const message = this.add.text(480, 340, messageText, {
       fontSize: '24px',
       fontFamily: fontFamily,

@@ -4,22 +4,31 @@ class GameScene extends Phaser.Scene {
     this.GROUND_Y = 440;
     this.PLATFORM_WIDTH = 64;
     this.GAP_WIDTH = 200;
-    this.WALK_SPEED = 150;
+    this.WALK_SPEEDS = [150, 185, 220];
     this.QUESTION_PLATFORM_Y = 220;
     this.WORLD_PADDING = 200;
+    this.CHAR_SCALE = 0.4;
+    this.CHAR_FEET_OFFSET = 68;
   }
 
-  create() {
-    this.score = 0;
+  create(data) {
+    this.currentLevel = (data.level || 1) - 1;
+    this.score = data.score || 0;
     this.currentQuestion = 0;
     this.gameState = 'RUNNING';
-    this.questions = this.cache.json.get('questions');
+
+    const levelData = this.cache.json.get('questions');
+    this.levelInfo = levelData.levels[this.currentLevel];
+    this.questions = this.levelInfo.questions;
     this.totalQuestions = this.questions.length;
+    this.totalLevels = levelData.levels.length;
+    this.walkSpeed = this.WALK_SPEEDS[this.currentLevel] || 150;
 
     this.createBackground();
     this.createWorld();
     this.createCharacter();
     this.createUI();
+    this.createLevelBanner();
     this.setupCamera();
     this.cameras.main.fadeIn(400);
     this.startWalking();
@@ -31,6 +40,9 @@ class GameScene extends Phaser.Scene {
     const bgImg = this.add.image(0, 0, 'beach_bg').setOrigin(0, 0);
     bgImg.setDisplaySize(worldWidth, 540);
     bgImg.setScrollFactor(0.1);
+
+    const levelTints = [0xffffff, 0xffeedd, 0xffddcc];
+    bgImg.setTint(levelTints[this.currentLevel] || 0xffffff);
 
     const bg = this.add.graphics();
     for (let i = 0; i < 540; i++) {
@@ -95,7 +107,7 @@ class GameScene extends Phaser.Scene {
       const x = this.WORLD_PADDING + i * (this.PLATFORM_WIDTH + this.GAP_WIDTH);
       const plat = this.platforms.create(x, this.GROUND_Y, 'ground').setDepth(10);
       plat.setScale(1, 1).refreshBody();
-      
+
       this.tweens.add({
         targets: plat,
         y: plat.y + 4,
@@ -134,7 +146,7 @@ class GameScene extends Phaser.Scene {
         const treeX = x + Phaser.Math.Between(-15, 15);
         this.add.image(treeX, this.GROUND_Y - 30, 'trunk').setDepth(12);
         const leaves = this.add.image(treeX, this.GROUND_Y - 55, 'leaves').setDepth(12);
-        
+
         this.tweens.add({
           targets: leaves,
           angle: Phaser.Math.Between(-3, 3),
@@ -148,26 +160,27 @@ class GameScene extends Phaser.Scene {
   }
 
   createCharacter() {
-    this.charContainer = this.add.container(this.WORLD_PADDING, this.GROUND_Y - 48).setDepth(15);
+    const charY = this.GROUND_Y - this.CHAR_FEET_OFFSET;
+    this.charContainer = this.add.container(this.WORLD_PADDING, charY).setDepth(15);
 
-    this.charShadow = this.add.ellipse(0, 34, 24, 8, 0x000000, 0.3);
+    this.charShadow = this.add.ellipse(0, this.CHAR_FEET_OFFSET, 24, 8, 0x000000, 0.3);
 
-    this.charSprite = this.add.sprite(0, 0, 'character', 4);
-    this.charSprite.setScale(0.35);
+    this.charSprite = this.add.sprite(0, 0, 'character', 5);
+    this.charSprite.setScale(this.CHAR_SCALE);
 
     this.charContainer.add([this.charShadow, this.charSprite]);
 
-    this.charContainer.setSize(30, 48);
+    this.charContainer.setSize(50, 100);
     this.physics.world.enable(this.charContainer);
     this.charContainer.body.setAllowGravity(false);
     this.charContainer.body.setCollideWorldBounds(false);
 
     this.isJumping = false;
     this.walkTween = null;
-    
+
     this.dustEmitter = this.add.particles(0, 0, 'particle', {
         x: { onEmit: () => this.charContainer.x, onUpdate: () => this.charContainer.x },
-        y: { onEmit: () => this.charContainer.y + 30, onUpdate: () => this.charContainer.y + 30 },
+        y: { onEmit: () => this.charContainer.y + this.CHAR_FEET_OFFSET, onUpdate: () => this.charContainer.y + this.CHAR_FEET_OFFSET },
         speed: { min: 10, max: 30 },
         angle: { min: 160, max: 200 },
         scale: { start: 1, end: 0 },
@@ -182,7 +195,7 @@ class GameScene extends Phaser.Scene {
   createUI() {
     const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
 
-    this.scoreText = this.add.text(20, 20, `Score: 0 / ${this.totalQuestions}`, {
+    this.scoreText = this.add.text(20, 20, `Score: ${this.score} / ${this.totalQuestions * this.totalLevels}`, {
       fontSize: '26px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
@@ -190,6 +203,16 @@ class GameScene extends Phaser.Scene {
       stroke: '#2c3e50',
       strokeThickness: 5,
       shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 4, stroke: false, fill: true }
+    }).setScrollFactor(0).setDepth(100);
+
+    this.levelText = this.add.text(20, 52, `Level ${this.currentLevel + 1}: ${this.levelInfo.name}`, {
+      fontSize: '18px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
+      color: '#f1c40f',
+      stroke: '#2c3e50',
+      strokeThickness: 3,
+      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 3, fill: true }
     }).setScrollFactor(0).setDepth(100);
 
     this.promptSign = this.add.image(480, 70, 'wooden_sign')
@@ -216,9 +239,9 @@ class GameScene extends Phaser.Scene {
       const x = 280 + i * 200;
       const platContainer = this.add.container(x, this.QUESTION_PLATFORM_Y)
         .setScrollFactor(0).setDepth(90).setVisible(false);
-      
+
       const plat = this.add.image(0, 0, 'platform');
-      
+
       const txt = this.add.text(0, 0, '', {
         fontSize: '22px',
         fontFamily: fontFamily,
@@ -296,7 +319,7 @@ class GameScene extends Phaser.Scene {
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
-    
+
     this.sparkleEmitter = this.add.particles(0, 0, 'sparkle', {
         speed: { min: 50, max: 150 },
         angle: { min: 0, max: 360 },
@@ -309,6 +332,56 @@ class GameScene extends Phaser.Scene {
     this.sparkleEmitter.stop();
   }
 
+  createLevelBanner() {
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
+    const bannerBg = this.add.graphics()
+      .setScrollFactor(0)
+      .setDepth(110)
+      .setAlpha(0);
+
+    const levelLabel = this.add.text(480, 230, `Level ${this.currentLevel + 1}`, {
+      fontSize: '24px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
+      color: '#f1c40f',
+      stroke: '#000000',
+      strokeThickness: 4
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(111).setAlpha(0);
+
+    const levelName = this.add.text(480, 270, this.levelInfo.name, {
+      fontSize: '48px',
+      fontFamily: fontFamily,
+      fontWeight: '900',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 6,
+      shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 6, fill: true }
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(111).setAlpha(0);
+
+    bannerBg.fillStyle(0x000000, 0.6);
+    bannerBg.fillRoundedRect(230, 210, 500, 100, 20);
+
+    this.tweens.add({
+      targets: [bannerBg, levelLabel, levelName],
+      alpha: 1,
+      duration: 400,
+      ease: 'Power2'
+    });
+
+    this.tweens.add({
+      targets: [bannerBg, levelLabel, levelName],
+      alpha: 0,
+      duration: 400,
+      delay: 1800,
+      ease: 'Power2',
+      onComplete: () => {
+        bannerBg.destroy();
+        levelLabel.destroy();
+        levelName.destroy();
+      }
+    });
+  }
+
   setupCamera() {
     const worldWidth = this.totalQuestions * (this.PLATFORM_WIDTH + this.GAP_WIDTH) + this.WORLD_PADDING * 2;
     this.cameras.main.setBounds(0, 0, worldWidth, 540);
@@ -316,13 +389,13 @@ class GameScene extends Phaser.Scene {
   }
 
   startWalking() {
-    this.charContainer.body.setVelocityX(this.WALK_SPEED);
+    this.charContainer.body.setVelocityX(this.walkSpeed);
     this.dustEmitter.start();
     this.charSprite.play('walk');
-    
+
     this.walkTween = this.tweens.add({
       targets: this.charContainer,
-      y: this.GROUND_Y - 52,
+      y: this.GROUND_Y - this.CHAR_FEET_OFFSET - 4,
       duration: 150,
       yoyo: true,
       repeat: -1,
@@ -334,10 +407,10 @@ class GameScene extends Phaser.Scene {
     this.charContainer.body.setVelocityX(0);
     this.dustEmitter.stop();
     this.charSprite.stop();
-    this.charSprite.setFrame(4);
+    this.charSprite.setFrame(5);
     if (this.walkTween) {
       this.walkTween.stop();
-      this.charContainer.y = this.GROUND_Y - 48;
+      this.charContainer.y = this.GROUND_Y - this.CHAR_FEET_OFFSET;
     }
   }
 
@@ -414,8 +487,8 @@ class GameScene extends Phaser.Scene {
     if (isCorrect) {
       this.score++;
       window.gameSound.playCorrect();
-      
-      this.scoreText.setText(`Score: ${this.score} / ${this.totalQuestions}`);
+
+      this.scoreText.setText(`Score: ${this.score} / ${this.totalQuestions * this.totalLevels}`);
       this.tweens.add({
           targets: this.scoreText,
           scale: 1.5,
@@ -429,8 +502,10 @@ class GameScene extends Phaser.Scene {
       plat.container.setScale(1.1);
 
       this.gameState = 'CORRECT';
-      
+
       this.sparkleEmitter.emitParticleAt(plat.container.x, plat.container.y, 30);
+
+      this.charSprite.play('celebrate');
 
       this.time.delayedCall(700, () => {
         this.hideQuestionUI();
@@ -441,6 +516,11 @@ class GameScene extends Phaser.Scene {
       plat.image.setTexture('platformRed');
       plat.image.setTint(0xffffff);
       this.answerTexts[index].setColor('#ffdddd');
+
+      this.charSprite.play('think');
+      this.time.delayedCall(400, () => {
+        if (this.gameState === 'QUESTION') this.charSprite.play('hurt');
+      });
 
       this.hintText.setText(q.hint).setVisible(true);
       this.hintText.scale = 0;
@@ -463,6 +543,7 @@ class GameScene extends Phaser.Scene {
           this.answerTexts[index].setColor('#ffffff');
           this.hintText.setVisible(false);
           plat.container.setScale(1);
+          this.charSprite.play('idle');
         }
       });
     }
@@ -521,6 +602,10 @@ class GameScene extends Phaser.Scene {
     const jumpHeight = 160;
     const jumpDistance = this.GAP_WIDTH + 75;
 
+    this.time.delayedCall(200, () => {
+      if (this.isJumping) this.charSprite.play('float');
+    });
+
     this.tweens.add({
         targets: this.charContainer,
         angle: 15,
@@ -528,7 +613,7 @@ class GameScene extends Phaser.Scene {
         yoyo: true,
         ease: 'Sine.easeInOut'
     });
-    
+
     this.tweens.add({
         targets: this.charShadow,
         scale: 0.3,
@@ -550,24 +635,80 @@ class GameScene extends Phaser.Scene {
       },
       onComplete: () => {
         this.isJumping = false;
-        this.charContainer.y = this.GROUND_Y - 48;
+        this.charContainer.y = this.GROUND_Y - this.CHAR_FEET_OFFSET;
         this.charContainer.angle = 0;
         window.gameSound.playLand();
+        this.charSprite.play('crouch');
 
-        this.dustEmitter.emitParticleAt(this.charContainer.x, this.charContainer.y + 30, 10);
+        this.dustEmitter.emitParticleAt(this.charContainer.x, this.charContainer.y + this.CHAR_FEET_OFFSET, 10);
 
-        if (this.currentQuestion >= this.totalQuestions - 1) {
-          this.time.delayedCall(500, () => {
-            this.scene.start('SuccessScene', {
-              score: this.score,
-              total: this.totalQuestions
-            });
+        this.time.delayedCall(300, () => {
+          if (this.currentQuestion >= this.totalQuestions - 1) {
+            this.handleLevelComplete();
+          } else {
+            this.gameState = 'RUNNING';
+            this.startWalking();
+            this.arrow.setAlpha(0.8);
+          }
+        });
+      }
+    });
+  }
+
+  handleLevelComplete() {
+    this.gameState = 'TRANSITION';
+    this.charSprite.play('celebrate');
+    this.charContainer.body.setVelocityX(0);
+
+    const fontFamily = '"Nunito", "Segoe UI", Arial, sans-serif';
+
+    const overlay = this.add.graphics()
+      .setScrollFactor(0)
+      .setDepth(110)
+      .setAlpha(0);
+    overlay.fillStyle(0x000000, 0.7);
+    overlay.fillRect(0, 0, 960, 540);
+
+    const completeText = this.add.text(480, 210, 'Level Complete!', {
+      fontSize: '52px',
+      fontFamily: fontFamily,
+      fontWeight: '900',
+      color: '#2ecc71',
+      stroke: '#000000',
+      strokeThickness: 6,
+      shadow: { offsetX: 0, offsetY: 4, color: '#000000', blur: 6, fill: true }
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(111).setAlpha(0);
+
+    const scoreMsg = this.add.text(480, 280, `Score: ${this.score} / ${this.totalQuestions * this.totalLevels}`, {
+      fontSize: '32px',
+      fontFamily: fontFamily,
+      fontWeight: 'bold',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 4
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(111).setAlpha(0);
+
+    this.tweens.add({
+      targets: [overlay, completeText, scoreMsg],
+      alpha: 1,
+      duration: 400,
+      ease: 'Power2'
+    });
+
+    this.time.delayedCall(2000, () => {
+      if (this.currentLevel < this.totalLevels - 1) {
+        this.scene.restart({
+          level: this.currentLevel + 2,
+          score: this.score
+        });
+      } else {
+        this.cameras.main.fadeOut(400, 0, 0, 0);
+        this.time.delayedCall(400, () => {
+          this.scene.start('SuccessScene', {
+            score: this.score,
+            total: this.totalQuestions * this.totalLevels
           });
-        } else {
-          this.gameState = 'RUNNING';
-          this.startWalking();
-          this.arrow.setAlpha(0.8);
-        }
+        });
       }
     });
   }

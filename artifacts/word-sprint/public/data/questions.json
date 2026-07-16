@@ -1,32 +1,109 @@
-[
-  {
-    "prompt": "What is the past tense of 'run'?",
-    "options": ["Ran", "Runned", "Running"],
-    "correct": 0,
-    "hint": "The past tense of 'run' is 'ran' - it's an irregular verb."
-  },
-  {
-    "prompt": "Which word is a synonym for 'happy'?",
-    "options": ["Sad", "Joyful", "Angry"],
-    "correct": 1,
-    "hint": "'Joyful' means feeling or showing great happiness."
-  },
-  {
-    "prompt": "Choose the correct verb: She ___ to the store yesterday.",
-    "options": ["go", "goes", "went"],
-    "correct": 2,
-    "hint": "'Went' is the past tense of 'go'."
-  },
-  {
-    "prompt": "Which word is a noun?",
-    "options": ["Quickly", "Beautiful", "Mountain"],
-    "correct": 2,
-    "hint": "A noun is a person, place, or thing. 'Mountain' is a place/thing."
-  },
-  {
-    "prompt": "What is the opposite of 'brave'?",
-    "options": ["Courageous", "Fearful", "Strong"],
-    "correct": 1,
-    "hint": "'Fearful' means feeling afraid - the opposite of brave."
-  }
-]
+{
+  "levels": [
+    {
+      "name": "Beach Basics",
+      "questions": [
+        {
+          "prompt": "What is the past tense of 'run'?",
+          "options": ["Ran", "Runned", "Running"],
+          "correct": 0,
+          "hint": "The past tense of 'run' is 'ran' - it's an irregular verb."
+        },
+        {
+          "prompt": "Which word is a synonym for 'happy'?",
+          "options": ["Sad", "Joyful", "Angry"],
+          "correct": 1,
+          "hint": "'Joyful' means feeling or showing great happiness."
+        },
+        {
+          "prompt": "Choose the correct verb: She ___ to the store yesterday.",
+          "options": ["go", "goes", "went"],
+          "correct": 2,
+          "hint": "'Went' is the past tense of 'go'."
+        },
+        {
+          "prompt": "Which word is a noun?",
+          "options": ["Quickly", "Beautiful", "Mountain"],
+          "correct": 2,
+          "hint": "A noun is a person, place, or thing. 'Mountain' is a place/thing."
+        },
+        {
+          "prompt": "What is the opposite of 'brave'?",
+          "options": ["Courageous", "Fearful", "Strong"],
+          "correct": 1,
+          "hint": "'Fearful' means feeling afraid - the opposite of brave."
+        }
+      ]
+    },
+    {
+      "name": "Tropical Challenge",
+      "questions": [
+        {
+          "prompt": "Which word means 'enormous'?",
+          "options": ["Tiny", "Gigantic", "Narrow"],
+          "correct": 1,
+          "hint": "'Gigantic' means extremely large in size."
+        },
+        {
+          "prompt": "What is the plural of 'child'?",
+          "options": ["Childs", "Childes", "Children"],
+          "correct": 2,
+          "hint": "'Children' is the irregular plural of 'child'."
+        },
+        {
+          "prompt": "Choose the correct form: They ___ playing outside.",
+          "options": ["is", "was", "are"],
+          "correct": 2,
+          "hint": "'They' is plural, so it takes 'are'."
+        },
+        {
+          "prompt": "Which word is an adjective?",
+          "options": ["Run", "Beautifully", "Quick"],
+          "correct": 2,
+          "hint": "An adjective describes a noun. 'Quick' describes how fast something is."
+        },
+        {
+          "prompt": "What does 'ancient' mean?",
+          "options": ["Brand new", "Very old", "Very fast"],
+          "correct": 1,
+          "hint": "'Ancient' means belonging to the very distant past."
+        }
+      ]
+    },
+    {
+      "name": "Island Master",
+      "questions": [
+        {
+          "prompt": "Which sentence uses 'their' correctly?",
+          "options": ["Their going home", "Their dog is cute", "They're their"],
+          "correct": 1,
+          "hint": "'Their' shows ownership. 'Their dog' means the dog belongs to them."
+        },
+        {
+          "prompt": "What is the past tense of 'think'?",
+          "options": ["Thinked", "Thought", "Throught"],
+          "correct": 1,
+          "hint": "'Thought' is the irregular past tense of 'think'."
+        },
+        {
+          "prompt": "Choose the correct word: The result was ___ expected.",
+          "options": ["barely", "barley", "berry"],
+          "correct": 0,
+          "hint": "'Barely' means hardly or almost not."
+        },
+        {
+          "prompt": "Which word means the opposite of 'generous'?",
+          "options": ["Kind", "Selfish", "Caring"],
+          "correct": 1,
+          "hint": "'Selfish' means caring only for oneself - the opposite of generous."
+        },
+        {
+          "prompt": "What part of speech is 'however'?",
+          "options": ["Noun", "Verb", "Conjunction"],
+          "correct": 2,
+          "hint": "'However' is a conjunction used to contrast ideas."
+        }
+      ]
+    }
+  ]
+}

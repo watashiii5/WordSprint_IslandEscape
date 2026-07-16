@@ -34,12 +34,10 @@ class BootScene extends Phaser.Scene {
     
     this.load.image('logo', 'assets/logo.png');
     this.load.image('beach_bg', 'assets/beach_bg.jpg');
-    this.load.image('wooden_sign', 'assets/wooden_sign.jpg');
-    this.load.image('stone_platform', 'assets/stone_platform.jpg');
-    
-    this.load.spritesheet('character', 'assets/character.png', {
-      frameWidth: 352,
-      frameHeight: 192
+    this.load.image('wooden_sign', 'assets/wooden_sign.png');
+    this.load.spritesheet('character', 'assets/character_1.png', {
+      frameWidth: 261,
+      frameHeight: 341
     });
   }
 
@@ -172,22 +170,47 @@ class BootScene extends Phaser.Scene {
 
     this.anims.create({
       key: 'idle',
+      frames: [{ key: 'character', frame: 5 }],
+      frameRate: 1
+    });
+
+    this.anims.create({
+      key: 'think',
       frames: [{ key: 'character', frame: 4 }],
       frameRate: 1
     });
 
     this.anims.create({
+      key: 'celebrate',
+      frames: this.anims.generateFrameNumbers('character', { start: 6, end: 6 }),
+      frameRate: 4,
+      repeat: 2
+    });
+
+    this.anims.create({
+      key: 'crouch',
+      frames: [{ key: 'character', frame: 7 }],
+      frameRate: 1
+    });
+
+    this.anims.create({
       key: 'jump',
-      frames: this.anims.generateFrameNumbers('character', { start: 8, end: 10 }),
+      frames: [{ key: 'character', frame: 8 }],
       frameRate: 10,
       repeat: 0
     });
 
     this.anims.create({
-      key: 'trip',
-      frames: this.anims.generateFrameNumbers('character', { start: 12, end: 15 }),
-      frameRate: 8,
-      repeat: 0
+      key: 'float',
+      frames: this.anims.generateFrameNumbers('character', { start: 9, end: 10 }),
+      frameRate: 4,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'hurt',
+      frames: [{ key: 'character', frame: 11 }],
+      frameRate: 1
     });
   }
 }

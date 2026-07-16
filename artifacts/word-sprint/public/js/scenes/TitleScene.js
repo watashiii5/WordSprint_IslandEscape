@@ -85,9 +85,8 @@ class TitleScene extends Phaser.Scene {
       });
     });
 
-    // Walking character
-    const char = this.add.sprite(120, 400, 'character');
-    char.setScale(0.35);
+    const char = this.add.sprite(120, 372, 'character');
+    char.setScale(0.4);
     char.play('walk');
     this.tweens.add({
       targets: char,
@@ -112,7 +111,7 @@ class TitleScene extends Phaser.Scene {
     });
 
     // Subtitle
-    const subtitle = this.add.text(480, 270, 'Test your vocabulary as you escape the island!', {
+    const subtitle = this.add.text(480, 270, 'Jump across the island by answering vocabulary questions!', {
       fontSize: '20px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
@@ -176,7 +175,7 @@ class TitleScene extends Phaser.Scene {
       window.gameSound.playClick();
       this.cameras.main.fadeOut(400, 0, 0, 0);
       this.time.delayedCall(400, () => {
-        this.scene.start('GameScene');
+        this.scene.start('GameScene', { level: 1, score: 0 });
       });
     });
 
@@ -201,7 +200,7 @@ class TitleScene extends Phaser.Scene {
     });
 
     // Instructions
-    const instructions = this.add.text(480, 450, 'Answer vocabulary questions to help your character jump across gaps!', {
+    const instructions = this.add.text(480, 450, '3 levels of increasing challenge — can you escape the island?', {
       fontSize: '16px',
       fontFamily: fontFamily,
       color: '#ecf0f1',
