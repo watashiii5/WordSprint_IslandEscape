@@ -449,6 +449,13 @@ class GameScene extends Phaser.Scene {
     this.stopWalking();
     this.charSprite.play('idle');
 
+    this.tweens.add({
+      targets: this.charContainer,
+      x: this.charContainer.x - 30,
+      duration: 200,
+      ease: 'Power2'
+    });
+
     const q = this.questions[index];
 
     this.promptSign.setVisible(true).setAlpha(0).setScale(1);
