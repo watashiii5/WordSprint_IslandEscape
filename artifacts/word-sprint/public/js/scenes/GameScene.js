@@ -167,15 +167,15 @@ class GameScene extends Phaser.Scene {
     this.charSprite = this.add.sprite(0, 0, 'character', 5);
     this.charSprite.setScale(this.CHAR_SCALE);
 
-    const frameW = 261 * this.CHAR_SCALE;
-    const frameH = 341 * this.CHAR_SCALE;
-    this.walkMaskShape = this.add.graphics();
-    this.walkMaskShape.fillStyle(0xffffff);
-    this.walkMaskShape.fillRect(-frameW / 2, -frameH / 2, frameW, frameH * 0.75);
-    this.charSprite.setMask(this.walkMaskShape.createGeometryMask());
-    this.walkMaskShape.setVisible(false);
+    this.charContainer.add([this.charShadow, this.charSprite]);
 
-    this.charContainer.add([this.charShadow, this.charSprite, this.walkMaskShape]);
+    const fw = 261 * this.CHAR_SCALE;
+    const fh = 341 * this.CHAR_SCALE;
+    this.charMaskGfx = this.add.graphics().setDepth(16);
+    this.charMaskGfx.fillStyle(0xffffff);
+    this.charMaskGfx.fillRect(-fw / 2, -fh / 2, fw, fh * 0.75);
+    this.charMaskGfx.setVisible(false);
+    this.charMask = this.charMaskGfx.createGeometryMask();
 
     this.charContainer.setSize(50, 100);
     this.physics.world.enable(this.charContainer);
@@ -223,13 +223,13 @@ class GameScene extends Phaser.Scene {
     }).setScrollFactor(0).setDepth(100);
 
     this.promptSign = this.add.image(480, 65, 'wooden_sign')
-      .setDisplaySize(260, 42)
+      .setDisplaySize(220, 36)
       .setScrollFactor(0)
       .setDepth(90)
       .setVisible(false);
 
     this.promptText = this.add.text(480, 65, '', {
-      fontSize: '16px',
+      fontSize: '22px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
       color: '#ffffff',
@@ -401,6 +401,7 @@ class GameScene extends Phaser.Scene {
     this.charContainer.body.setVelocityX(this.walkSpeed);
     this.dustEmitter.start();
     this.charSprite.play('walk');
+    this.charSprite.setMask(this.charMask);
 
     this.walkTween = this.tweens.add({
       targets: this.charContainer,
@@ -415,6 +416,7 @@ class GameScene extends Phaser.Scene {
   stopWalking() {
     this.charContainer.body.setVelocityX(0);
     this.dustEmitter.stop();
+    this.charSprite.setMask(false);
     this.charSprite.stop();
     this.charSprite.setFrame(5);
     if (this.walkTween) {
@@ -424,6 +426,10 @@ class GameScene extends Phaser.Scene {
   }
 
   update() {
+    if (this.charMaskGfx && this.charContainer) {
+      this.charMaskGfx.setPosition(this.charContainer.x, this.charContainer.y);
+    }
+
     if (this.gameState !== 'RUNNING') return;
 
     for (const gap of this.gaps) {
