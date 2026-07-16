@@ -215,13 +215,13 @@ class GameScene extends Phaser.Scene {
     }).setScrollFactor(0).setDepth(100);
 
     this.promptSign = this.add.image(480, 65, 'wooden_sign')
-      .setDisplaySize(480, 75)
+      .setDisplaySize(340, 55)
       .setScrollFactor(0)
       .setDepth(90)
       .setVisible(false);
 
     this.promptText = this.add.text(480, 65, '', {
-      fontSize: '22px',
+      fontSize: '18px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
       color: '#ffffff',
@@ -392,7 +392,7 @@ class GameScene extends Phaser.Scene {
   startWalking() {
     this.charContainer.body.setVelocityX(this.walkSpeed);
     this.dustEmitter.start();
-    this.charSprite.setCrop(0, 0, 261, 326);
+    this.charSprite.setCrop(0, 0, 261, 256);
     this.charSprite.play('walk');
 
     this.walkTween = this.tweens.add({
