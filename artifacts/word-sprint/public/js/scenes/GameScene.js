@@ -8,7 +8,7 @@ class GameScene extends Phaser.Scene {
     this.QUESTION_PLATFORM_Y = 220;
     this.WORLD_PADDING = 200;
     this.CHAR_SCALE = 0.4;
-    this.CHAR_FEET_OFFSET = 60;
+    this.CHAR_FEET_OFFSET = 100;
   }
 
   create(data) {
@@ -166,7 +166,6 @@ class GameScene extends Phaser.Scene {
 
     this.charSprite = this.add.sprite(0, 0, 'character', 5);
     this.charSprite.setScale(this.CHAR_SCALE);
-    this.charSprite.setOrigin(0.5, 0.45);
 
     this.charContainer.add([this.charShadow, this.charSprite]);
 
@@ -215,14 +214,14 @@ class GameScene extends Phaser.Scene {
       shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 3, fill: true }
     }).setScrollFactor(0).setDepth(100);
 
-    this.promptSign = this.add.image(480, 70, 'wooden_sign')
-      .setDisplaySize(720, 110)
+    this.promptSign = this.add.image(480, 65, 'wooden_sign')
+      .setDisplaySize(480, 75)
       .setScrollFactor(0)
       .setDepth(90)
       .setVisible(false);
 
-    this.promptText = this.add.text(480, 70, '', {
-      fontSize: '28px',
+    this.promptText = this.add.text(480, 65, '', {
+      fontSize: '22px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
       color: '#ffffff',
@@ -393,6 +392,7 @@ class GameScene extends Phaser.Scene {
   startWalking() {
     this.charContainer.body.setVelocityX(this.walkSpeed);
     this.dustEmitter.start();
+    this.charSprite.setCrop(0, 0, 261, 326);
     this.charSprite.play('walk');
 
     this.walkTween = this.tweens.add({
@@ -408,6 +408,7 @@ class GameScene extends Phaser.Scene {
   stopWalking() {
     this.charContainer.body.setVelocityX(0);
     this.dustEmitter.stop();
+    this.charSprite.setCrop();
     this.charSprite.stop();
     this.charSprite.setFrame(5);
     if (this.walkTween) {
