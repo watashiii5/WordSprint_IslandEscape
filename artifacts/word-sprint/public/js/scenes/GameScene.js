@@ -167,6 +167,13 @@ class GameScene extends Phaser.Scene {
     this.charSprite = this.add.sprite(0, 0, 'character', 5);
     this.charSprite.setScale(this.CHAR_SCALE);
 
+    const frameW = 261 * this.CHAR_SCALE;
+    const frameH = 341 * this.CHAR_SCALE;
+    this.walkMaskShape = this.make.graphics({ x: 0, y: 0, add: false });
+    this.walkMaskShape.fillStyle(0xffffff);
+    this.walkMaskShape.fillRect(-frameW / 2, -frameH / 2, frameW, frameH * 0.75);
+    this.charSprite.setMask(this.walkMaskShape.createGeometryMask());
+
     this.charContainer.add([this.charShadow, this.charSprite]);
 
     this.charContainer.setSize(50, 100);
@@ -393,7 +400,6 @@ class GameScene extends Phaser.Scene {
     this.charContainer.body.setVelocityX(this.walkSpeed);
     this.dustEmitter.start();
     this.charSprite.play('walk');
-    this.charSprite.setCrop(0, 0, 261, 256);
 
     this.walkTween = this.tweens.add({
       targets: this.charContainer,
@@ -408,7 +414,6 @@ class GameScene extends Phaser.Scene {
   stopWalking() {
     this.charContainer.body.setVelocityX(0);
     this.dustEmitter.stop();
-    this.charSprite.setCrop();
     this.charSprite.stop();
     this.charSprite.setFrame(5);
     if (this.walkTween) {
