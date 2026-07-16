@@ -169,12 +169,13 @@ class GameScene extends Phaser.Scene {
 
     const frameW = 261 * this.CHAR_SCALE;
     const frameH = 341 * this.CHAR_SCALE;
-    this.walkMaskShape = this.make.graphics({ x: 0, y: 0, add: false });
+    this.walkMaskShape = this.add.graphics();
     this.walkMaskShape.fillStyle(0xffffff);
     this.walkMaskShape.fillRect(-frameW / 2, -frameH / 2, frameW, frameH * 0.75);
     this.charSprite.setMask(this.walkMaskShape.createGeometryMask());
+    this.walkMaskShape.setVisible(false);
 
-    this.charContainer.add([this.charShadow, this.charSprite]);
+    this.charContainer.add([this.charShadow, this.charSprite, this.walkMaskShape]);
 
     this.charContainer.setSize(50, 100);
     this.physics.world.enable(this.charContainer);
