@@ -170,7 +170,7 @@ class SuccessScene extends Phaser.Scene {
 
     btnZone.on('pointerdown', () => {
       window.gameSound.playClick();
-      this.scene.start('GameScene');
+      this.scene.start('LevelSelectScene');
     });
 
     this.tweens.add({
