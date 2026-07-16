@@ -11,11 +11,11 @@ class BootScene extends Phaser.Scene {
     barBg.fillRoundedRect(w / 2 - 160, h / 2 - 15, 320, 30, 8);
     const bar = this.add.graphics();
     const loadingText = this.add.text(w / 2, h / 2 - 40, 'Loading...', {
-      fontSize: '22px',
-      fontFamily: '"Nunito", Arial, sans-serif',
+      fontSize: '16px',
+      fontFamily: '"Press Start 2P", monospace',
       color: '#ffffff',
-      stroke: '#2c3e50',
-      strokeThickness: 3
+      stroke: '#000000',
+      strokeThickness: 4
     }).setOrigin(0.5);
 
     this.load.on('progress', (value) => {

@@ -4,6 +4,7 @@ const GAME_CONFIG = {
   height: 540,
   parent: 'game-container',
   backgroundColor: '#87CEEB',
+  pixelArt: true,
   physics: {
     default: 'arcade',
     arcade: {
@@ -11,5 +12,5 @@ const GAME_CONFIG = {
       debug: false
     }
   },
-  scene: ['BootScene', 'TitleScene', 'GameScene', 'SuccessScene']
+  scene: ['BootScene', 'TitleScene', 'LevelSelectScene', 'GameScene', 'GameOverScene', 'SuccessScene']
 };

@@ -15,26 +15,28 @@
     <link rel="icon" type="image/png" href="/assets/weblogo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        background: #000000;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Press Start 2P', monospace;
         overflow: hidden;
       }
       #game-container {
-        border-radius: 12px;
+        border-radius: 4px;
         overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 0 4px rgba(255,255,255,0.1);
+        box-shadow: 0 0 0 4px #ffffff;
         position: relative;
       }
       canvas {
         display: block;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
       }
     </style>
   </head>
@@ -47,6 +49,7 @@
     <script src="/js/scenes/TitleScene.js?v=3"></script>
     <script src="/js/scenes/LevelSelectScene.js?v=3"></script>
     <script src="/js/scenes/GameScene.js?v=3"></script>
+    <script src="/js/scenes/GameOverScene.js?v=3"></script>
     <script src="/js/scenes/SuccessScene.js?v=3"></script>
     <script src="/js/game.js?v=3"></script>
   </body>
