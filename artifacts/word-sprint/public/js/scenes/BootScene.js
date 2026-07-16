@@ -132,7 +132,7 @@ class BootScene extends Phaser.Scene {
     g.generateTexture('platformRed', 160, 50);
 
     // Wooden sign with parchment overlay (high-quality procedural)
-    const sw = 400, sh = 120;
+    const sw = 560, sh = 130;
     g.clear();
 
     // Dark wood plank base

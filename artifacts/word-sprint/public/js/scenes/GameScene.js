@@ -230,20 +230,20 @@ class GameScene extends Phaser.Scene {
       this.hearts.push(heart);
     }
 
-    this.promptSign = this.add.image(480, 65, 'wooden_sign')
-      .setDisplaySize(340, 55)
+    this.promptSign = this.add.image(480, 70, 'wooden_sign')
+      .setDisplaySize(540, 125)
       .setScrollFactor(0)
       .setDepth(90)
       .setVisible(false);
 
-    this.promptText = this.add.text(480, 65, '', {
-      fontSize: '22px',
+    this.promptText = this.add.text(480, 70, '', {
+      fontSize: '20px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
       color: '#ffffff',
       stroke: '#2c3e50',
       strokeThickness: 4,
-      wordWrap: { width: 660 },
+      wordWrap: { width: 480 },
       align: 'center'
     }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
 
@@ -251,20 +251,21 @@ class GameScene extends Phaser.Scene {
     this.answerTexts = [];
 
     for (let i = 0; i < 3; i++) {
-      const x = 280 + i * 200;
+      const x = 240 + i * 240;
       const platContainer = this.add.container(x, this.QUESTION_PLATFORM_Y)
         .setScrollFactor(0).setDepth(90).setVisible(false);
 
-      const plat = this.add.image(0, 0, 'platform');
+      const plat = this.add.image(0, 0, 'platform')
+        .setDisplaySize(200, 55);
 
       const txt = this.add.text(0, 0, '', {
-        fontSize: '22px',
+        fontSize: '20px',
         fontFamily: fontFamily,
         fontWeight: 'bold',
         color: '#ffffff',
         stroke: '#2c3e50',
         strokeThickness: 4,
-        wordWrap: { width: 140 },
+        wordWrap: { width: 180 },
         align: 'center'
       }).setOrigin(0.5);
 
@@ -311,15 +312,15 @@ class GameScene extends Phaser.Scene {
 
     this._hoveredBtn = null;
 
-    this.hintText = this.add.text(480, 310, '', {
-      fontSize: '20px',
+    this.hintText = this.add.text(480, 320, '', {
+      fontSize: '18px',
       fontFamily: fontFamily,
       fontWeight: 'bold',
       color: '#ffeb3b',
       stroke: '#c0392b',
       strokeThickness: 4,
       shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 2, fill: true },
-      wordWrap: { width: 660 },
+      wordWrap: { width: 500 },
       align: 'center'
     }).setScrollFactor(0).setDepth(91).setVisible(false).setOrigin(0.5);
 
