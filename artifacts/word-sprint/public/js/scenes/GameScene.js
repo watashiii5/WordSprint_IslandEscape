@@ -11,7 +11,7 @@ class GameScene extends Phaser.Scene {
     this.CHAR_FEET_OFFSET = 100;
   }
 
-  create() {
+  create(data) {
     this.currentLevel = (data.level || 1) - 1;
     this.score = data.score || 0;
     this.lives = 3;

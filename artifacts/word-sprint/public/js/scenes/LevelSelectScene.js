@@ -16,21 +16,16 @@ class LevelSelectScene extends Phaser.Scene {
       bg.fillRect(0, i, 960, 1);
     }
 
-    const sun = this.add.graphics();
-    sun.fillStyle(0xffeaa7, 1);
-    sun.fillRect(720, 90, 60, 60);
-    sun.fillStyle(0xf1c40f, 1);
-    sun.fillRect(725, 95, 50, 50);
+    const sun = this.add.circle(750, 120, 50, 0xffeaa7);
     this.tweens.add({
       targets: sun, scale: 1.1, alpha: 0.8, duration: 2000,
       yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
     });
 
     for (let i = 0; i < 4; i++) {
-      const cloud = this.add.graphics();
-      cloud.fillStyle(0xffffff, 0.8);
-      cloud.fillRect(100 + i * 230, 60 + Phaser.Math.Between(-20, 40), 60, 20);
-      cloud.fillRect(110 + i * 230, 50 + Phaser.Math.Between(-20, 40), 40, 15);
+      const cloud = this.add.image(100 + i * 230, 60 + Phaser.Math.Between(-20, 40), 'cloud');
+      cloud.setAlpha(Phaser.Math.FloatBetween(0.6, 0.9));
+      cloud.setScale(Phaser.Math.FloatBetween(0.8, 1.4));
       this.tweens.add({
         targets: cloud, x: cloud.x + Phaser.Math.Between(20, 40),
         duration: Phaser.Math.Between(4000, 7000),
